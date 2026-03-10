@@ -350,7 +350,7 @@ abn — Employer ABN: 11 digits, no spaces, no dashes.
 FALLBACK: If any numeric field not found, use 0. If any text field not found, use "".
 NEVER include $ symbols or commas in numbers — plain decimals only (e.g. 1234.56).`;
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/parse", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -440,7 +440,7 @@ name — Full name of the employee.
 abn — Employer ABN: 11 digits, no spaces.
 NEVER include $ symbols or commas — plain decimals only (e.g. 1234.56).`;
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/parse", {
     method: "POST",
     headers: { "Content-Type": "application/json", "anthropic-version": "2023-06-01" },
     body: JSON.stringify({
