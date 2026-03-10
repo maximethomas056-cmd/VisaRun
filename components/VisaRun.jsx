@@ -350,7 +350,7 @@ abn — Employer ABN: 11 digits, no spaces, no dashes.
 FALLBACK: If any numeric field not found, use 0. If any text field not found, use "".
 NEVER include $ symbols or commas in numbers — plain decimals only (e.g. 1234.56).`;
 
-  const response = await fetch("/api/parse", {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -368,8 +368,14 @@ NEVER include $ symbols or commas in numbers — plain decimals only (e.g. 1234.
     throw new Error(err?.error?.message || `Erreur API ${response.status}`);
   }
 
-  const parsed = await response.json();
-  if (parsed.error) throw new Error(parsed.error);
+  const data = await response.json();
+  const text = data.content.map(b => b.text || "").join("").trim();
+  // Robuste : retire les balises markdown puis extrait le bloc JSON
+  // même si Claude Haiku ajoute du texte avant ou après (Bug #5 corrigé)
+  const stripped = text.replace(/```json|```/g, "").trim();
+  const jsonMatch = stripped.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("Réponse IA invalide — aucun JSON trouvé");
+  const parsed = JSON.parse(jsonMatch[0]);
 
   const pDays = dateDiff(parsed.periodFrom, parsed.periodTo);
   const farmDays = calcVisaDays(parsed.hoursWorked || 0, pDays);
@@ -434,7 +440,7 @@ name — Full name of the employee.
 abn — Employer ABN: 11 digits, no spaces.
 NEVER include $ symbols or commas — plain decimals only (e.g. 1234.56).`;
 
-  const response = await fetch("/api/parse", {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json", "anthropic-version": "2023-06-01" },
     body: JSON.stringify({
@@ -450,8 +456,12 @@ NEVER include $ symbols or commas — plain decimals only (e.g. 1234.56).`;
     const err = await response.json().catch(()=>({}));
     throw new Error(err?.error?.message || `API Error ${response.status}`);
   }
-  const parsed = await response.json();
-  if (parsed.error) throw new Error(parsed.error);
+  const data = await response.json();
+  const text = data.content.map(b => b.text || "").join("").trim();
+  const stripped = text.replace(/```json|```/g, "").trim();
+  const jsonMatch = stripped.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("Invalid AI response — no JSON found");
+  const parsed = JSON.parse(jsonMatch[0]);
   const pDays = dateDiff(parsed.periodFrom, parsed.periodTo);
   const farmDays = calcVisaDays(parsed.hoursWorked || 0, pDays);
   const date = parsed.periodFrom && parsed.periodTo ? parsed.periodFrom + " – " + parsed.periodTo : "";
