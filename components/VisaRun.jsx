@@ -44,7 +44,6 @@ const CSS=`
 
 const STORAGE_KEY = "visarun_entries_v1";
 const GOAL_KEY    = "visarun_goal_v1";
-const API_KEY_STORAGE = "visarun_apikey_v1";
 
 async function storageGet(key){
   try{if(window.storage){const r=await window.storage.get(key);return r?r.value:null;}
@@ -59,8 +58,6 @@ async function loadEntries(){try{const r=await storageGet(STORAGE_KEY);return r?
 async function saveEntries(e){await storageSet(STORAGE_KEY,JSON.stringify(e))}
 async function loadGoal(){try{const r=await storageGet(GOAL_KEY);return r?Number(r):88}catch{return 88}}
 async function saveGoal(g){await storageSet(GOAL_KEY,String(g))}
-async function loadApiKey(){try{return await storageGet(API_KEY_STORAGE)||""}catch{return""}}
-async function saveApiKey(k){await storageSet(API_KEY_STORAGE,k)}
 
 const pdfReadyPromise = new Promise((res) => {
   if (typeof window === "undefined") return res(false);
@@ -281,38 +278,6 @@ function ScanOverlay({draft}){
   );
 }
 
-function ApiKeyBanner({apiKey, onSave}){
-  const[val,setVal]=useState(apiKey||"");
-  const[show,setShow]=useState(false);
-  const hasKey=apiKey&&apiKey.startsWith("sk-ant-");
-  return(
-    <div style={{background:hasKey?C.greenBg:C.amberBg,borderBottom:`1px solid ${hasKey?C.greenBorder:"#fde68a"}`,padding:"10px 20px"}}>
-      {hasKey?(
-        <div style={{display:"flex",alignItems:"center",gap:10,maxWidth:600,margin:"0 auto"}}>
-          <span style={{fontSize:14}}>🔑</span>
-          <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.green,fontWeight:600}}>API key configured — AI parser active</span>
-          <button onClick={()=>setShow(p=>!p)} style={{marginLeft:"auto",fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.textFaint,background:"transparent",border:"none",cursor:"pointer",textDecoration:"underline"}}>{show?"Hide":"Edit"}</button>
-        </div>
-      ):(
-        <div style={{maxWidth:600,margin:"0 auto"}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-            <span style={{fontSize:14}}>⚠️</span>
-            <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.amber,fontWeight:600}}>Anthropic API key required to scan payslips</span>
-          </div>
-        </div>
-      )}
-      {(!hasKey||show)&&(
-        <div style={{maxWidth:600,margin:"0 auto",marginTop:hasKey?8:0,display:"flex",gap:8}}>
-          <input className="api-key-input" type={show?"text":"password"} value={val} onChange={e=>setVal(e.target.value)} placeholder="sk-ant-api03-..."
-            style={{flex:1,fontFamily:"'DM Sans',sans-serif",fontSize:12,padding:"8px 12px",borderRadius:8,border:`1.5px solid ${C.border}`,background:"#fff",color:C.text}}/>
-          <button onClick={()=>{if(val.trim()){onSave(val.trim());setShow(false);}}}
-            style={{padding:"8px 16px",borderRadius:8,border:"none",background:C.green,color:"#fff",fontFamily:"'DM Sans',sans-serif",fontSize:12,fontWeight:600,cursor:"pointer"}}>Save</button>
-        </div>
-      )}
-      {!hasKey&&<div style={{maxWidth:600,margin:"4px auto 0",fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.textFaint}}>Get your key at <a href="https://console.anthropic.com" target="_blank" rel="noreferrer" style={{color:C.teal}}>console.anthropic.com</a> → API Keys</div>}
-    </div>
-  );
-}
 
 function FiscalBanner(){
   const now=new Date();
@@ -583,7 +548,6 @@ export default function VisaRunApp(){
   const[goal,setGoal]=useState(88);
   const[rooJump,setRooJump]=useState(false);
   const[confetti,setConfetti]=useState(null);
-  const[apiKey,setApiKey]=useState("");
   const streak=useMemo(()=>{
     if(!entries.length) return 0;
     const weeks=new Set(entries.map(e=>{
@@ -608,7 +572,6 @@ export default function VisaRunApp(){
   useEffect(()=>{
     loadEntries().then(e=>setEntries(e));
     loadGoal().then(g=>setGoal(g));
-    loadApiKey().then(k=>setApiKey(k));
   },[]);
 
   useEffect(()=>{
@@ -670,7 +633,6 @@ export default function VisaRunApp(){
 
   const handleConfirm=data=>{const{filename,editMode,originalEntry}=modal;setModal(null);if(editMode)saveEdit(data,originalEntry);else addEntry(data,filename);resolver.current?.();resolver.current=null;};
   const handleDismiss=()=>{setModal(null);if(!modal?.editMode)showToast("Payslip ignored.",false);resolver.current?.();resolver.current=null;};
-  const handleApiSave=k=>{setApiKey(k);saveApiKey(k);showToast("API key saved ✓");};
 
   return(
     <div onDragOver={e=>{e.preventDefault();setDragging(true);}} onDragLeave={()=>setDragging(false)} onDrop={e=>{e.preventDefault();setDragging(false);processFiles(Array.from(e.dataTransfer.files));}} style={{background:C.bg,minHeight:"100vh",fontFamily:"'DM Sans',sans-serif"}}>
@@ -688,11 +650,10 @@ export default function VisaRunApp(){
         </div>
         <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:10}}>
           {streak>0&&<div style={{background:C.amberBg,border:"1px solid #fde68a",borderRadius:8,padding:"5px 10px",fontSize:11,color:C.amber,fontWeight:700,display:"flex",alignItems:"center",gap:4}}><span>🔥</span>{streak}w</div>}
-          <div style={{background:C.greenBg,border:`1px solid ${C.greenBorder}`,borderRadius:8,padding:"5px 12px",fontSize:11,color:C.green,fontWeight:600}}>● Active</div>
+          
         </div>
       </div>
 
-      <ApiKeyBanner apiKey={apiKey} onSave={handleApiSave}/>
       <FiscalBanner/>
       <HeroProgress totalDays={totalDays} goal={goal} onGoalChange={setGoal} rooJump={rooJump}/>
       <StatCards totals={totals}/>
