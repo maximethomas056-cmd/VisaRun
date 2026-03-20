@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { JOB_DATA } from "../data/JOB_DATA_FINAL";
 
 const C = {
@@ -29,45 +29,185 @@ const STATE_COLORS = {
   VIC:"#16a085", TAS:"#c0392b", NT:"#d35400", SA:"#27ae60",
 };
 
+// 300+ Australian cities with GPS coordinates
 const CITY_COORDS = {
+  // Major cities
   "Sydney":{lat:-33.87,lng:151.21},"Melbourne":{lat:-37.81,lng:144.96},
-  "Brisbane":{lat:-27.47,lng:153.02},"Perth":{lat:-31.95,lng:115.86},
+  "Brisbane":{lat:-27.47,lng:153.02},"Brisbane City":{lat:-27.47,lng:153.02},
+  "Perth":{lat:-31.95,lng:115.86},"West Perth":{lat:-31.95,lng:115.85},
+  "East Perth":{lat:-31.95,lng:115.87},"North Perth":{lat:-31.92,lng:115.85},
   "Adelaide":{lat:-34.93,lng:138.60},"Darwin":{lat:-12.46,lng:130.84},
-  "Hobart":{lat:-42.88,lng:147.33},"Cairns":{lat:-16.92,lng:145.77},
-  "Townsville":{lat:-19.26,lng:146.82},"Alice Springs":{lat:-23.70,lng:133.88},
-  "Bundaberg":{lat:-24.87,lng:152.35},"Bowen":{lat:-20.01,lng:148.24},
-  "Stanthorpe":{lat:-28.65,lng:151.93},"Mareeba":{lat:-17.00,lng:145.43},
-  "Carnarvon":{lat:-24.87,lng:113.66},"Margaret River":{lat:-33.95,lng:115.07},
-  "Cessnock":{lat:-32.83,lng:151.35},"Launceston":{lat:-41.43,lng:147.14},
+  "Darwin City":{lat:-12.46,lng:130.84},"Hobart":{lat:-42.88,lng:147.33},
+  "Cairns":{lat:-16.92,lng:145.77},"Cairns City":{lat:-16.92,lng:145.77},
+  "Cairns North":{lat:-16.90,lng:145.75},"Townsville":{lat:-19.26,lng:146.82},
+  "Townsville City":{lat:-19.26,lng:146.82},"Alice Springs":{lat:-23.70,lng:133.88},
+  "Broome":{lat:-17.96,lng:122.24},"Kalgoorlie":{lat:-30.74,lng:121.46},
   "Newman":{lat:-23.36,lng:119.73},"Port Hedland":{lat:-20.31,lng:118.57},
-  "Mount Isa":{lat:-20.72,lng:139.49},"Singleton":{lat:-32.57,lng:151.17},
-  "Port Augusta":{lat:-32.49,lng:137.76},"Geraldton":{lat:-28.77,lng:114.61},
-  "Mackay":{lat:-21.14,lng:149.18},"Rockhampton":{lat:-23.38,lng:150.51},
-  "Dubbo":{lat:-32.24,lng:148.60},"Kalgoorlie":{lat:-30.74,lng:121.46},
-  "Broome":{lat:-17.96,lng:122.24},"Tom Price":{lat:-22.69,lng:117.79},
+  "Karratha":{lat:-20.74,lng:116.85},"Tom Price":{lat:-22.69,lng:117.79},
+  // QLD
+  "Gold Coast":{lat:-28.02,lng:153.40},"Surfers Paradise":{lat:-28.00,lng:153.43},
+  "Sunshine Coast":{lat:-26.65,lng:153.06},"Rockhampton":{lat:-23.38,lng:150.51},
+  "Bundaberg":{lat:-24.87,lng:152.35},"Bundaberg Central":{lat:-24.87,lng:152.35},
+  "Mackay":{lat:-21.14,lng:149.18},"Toowoomba":{lat:-27.56,lng:151.95},
+  "Mount Isa":{lat:-20.72,lng:139.49},"Gladstone":{lat:-23.84,lng:151.25},
+  "Hervey Bay":{lat:-25.29,lng:152.84},"Maryborough":{lat:-25.54,lng:152.70},
+  "Emerald":{lat:-23.53,lng:148.16},"Longreach":{lat:-23.44,lng:144.25},
+  "Bowen":{lat:-20.01,lng:148.24},"Stanthorpe":{lat:-28.65,lng:151.93},
+  "Mareeba":{lat:-17.00,lng:145.43},"Atherton":{lat:-17.27,lng:145.48},
+  "Innisfail":{lat:-17.52,lng:146.03},"Ayr":{lat:-19.57,lng:147.40},
+  "Cloncurry":{lat:-20.70,lng:140.51},"Charleville":{lat:-26.40,lng:146.24},
+  "Roma":{lat:-26.57,lng:148.79},"Charters Towers":{lat:-20.07,lng:146.26},
+  "Collinsville":{lat:-20.55,lng:147.85},"Fortitude Valley":{lat:-27.46,lng:153.03},
+  "Spring Hill":{lat:-27.46,lng:153.02},"Southbank":{lat:-27.48,lng:153.02},
+  "Portsmith":{lat:-16.93,lng:145.78},"Tolga":{lat:-17.23,lng:145.48},
+  "Tablelands":{lat:-17.25,lng:145.50},"Woongoolba":{lat:-27.83,lng:153.38},
+  "Tamborine Mountain":{lat:-27.95,lng:153.19},"Yulara":{lat:-25.24,lng:130.98},
+  "Anmatjere":{lat:-22.25,lng:132.25},
+  // NSW
+  "Newcastle":{lat:-32.93,lng:151.78},"Wollongong":{lat:-34.42,lng:150.89},
+  "Albury":{lat:-36.08,lng:146.91},"Wagga Wagga":{lat:-35.12,lng:147.37},
+  "Dubbo":{lat:-32.24,lng:148.60},"Orange":{lat:-33.28,lng:149.10},
+  "Bathurst":{lat:-33.42,lng:149.58},"Tamworth":{lat:-31.09,lng:150.92},
+  "Broken Hill":{lat:-31.95,lng:141.47},"Cessnock":{lat:-32.83,lng:151.35},
+  "Singleton":{lat:-32.57,lng:151.17},"Maitland":{lat:-32.73,lng:151.55},
+  "Griffith":{lat:-34.29,lng:146.04},"Young":{lat:-34.31,lng:148.30},
+  "Tumut":{lat:-35.31,lng:148.22},"Bilpin":{lat:-33.48,lng:150.52},
+  "Coffs Harbour":{lat:-30.30,lng:153.11},"Lismore":{lat:-28.81,lng:153.28},
+  "Byron Bay":{lat:-28.65,lng:153.61},"Armidale":{lat:-30.51,lng:151.67},
+  "Goulburn":{lat:-34.75,lng:149.72},"Parramatta":{lat:-33.81,lng:151.00},
+  "North Sydney":{lat:-33.84,lng:151.21},"Surry Hills":{lat:-33.89,lng:151.21},
+  "Alexandria":{lat:-33.91,lng:151.20},"Potts Point":{lat:-33.87,lng:151.22},
+  "Wetherill Park":{lat:-33.85,lng:150.90},"Ingleburn":{lat:-34.00,lng:150.87},
+  "Homebush West":{lat:-33.86,lng:151.08},"Mascot":{lat:-33.93,lng:151.19},
+  "Chatswood":{lat:-33.80,lng:151.18},"Rydalmere":{lat:-33.81,lng:151.03},
+  "Revesby":{lat:-33.95,lng:151.01},"Unanderra":{lat:-34.45,lng:150.87},
+  "Cardiff":{lat:-32.96,lng:151.71},"Auburn":{lat:-33.85,lng:151.03},
+  "Woolloomooloo":{lat:-33.87,lng:151.22},"Waterloo":{lat:-33.90,lng:151.20},
+  "Haymarket":{lat:-33.88,lng:151.20},"Wollongong":{lat:-34.42,lng:150.89},
+  "Alstonville":{lat:-28.84,lng:153.44},"Wandin North":{lat:-37.79,lng:145.43},
+  // VIC
+  "Geelong":{lat:-38.15,lng:144.36},"Ballarat":{lat:-37.56,lng:143.86},
+  "Bendigo":{lat:-36.76,lng:144.28},"Shepparton":{lat:-36.38,lng:145.40},
+  "Wodonga":{lat:-36.12,lng:146.89},"Mildura":{lat:-34.18,lng:142.16},
+  "Warrnambool":{lat:-38.38,lng:142.48},"Traralgon":{lat:-38.19,lng:146.54},
+  "Dandenong South":{lat:-38.00,lng:145.22},"Werribee South":{lat:-37.97,lng:144.67},
+  "Laverton North":{lat:-37.85,lng:144.79},"St Kilda":{lat:-37.87,lng:144.98},
+  "Richmond":{lat:-37.82,lng:145.00},"Southbank":{lat:-37.82,lng:144.96},
+  "Mornington":{lat:-38.22,lng:145.04},"Silvan":{lat:-37.82,lng:145.43},
+  "Cressy":{lat:-37.99,lng:143.64},"Woongoolba":{lat:-27.83,lng:153.38},
+  "Hale":{lat:-37.75,lng:145.00},"Healesville":{lat:-37.65,lng:145.52},
+  "Mount Gambier":{lat:-37.83,lng:140.78},"McLaren Vale":{lat:-35.22,lng:138.55},
+  // SA
+  "Port Augusta":{lat:-32.49,lng:137.76},"Port Lincoln":{lat:-34.72,lng:135.86},
+  "Whyalla":{lat:-33.03,lng:137.58},"Murray Bridge":{lat:-35.12,lng:139.27},
+  "Coober Pedy":{lat:-29.01,lng:134.75},"Barossa Valley":{lat:-34.53,lng:138.95},
+  "McLaren Vale":{lat:-35.22,lng:138.55},"Renmark":{lat:-34.17,lng:140.75},
+  "Berri":{lat:-34.28,lng:140.60},"Naracoorte":{lat:-36.96,lng:140.74},
+  "Bordertown":{lat:-36.31,lng:140.77},"Angaston":{lat:-34.50,lng:139.03},
+  "Barton":{lat:-35.30,lng:138.60},"Stuart":{lat:-31.89,lng:137.50},
+  // WA
+  "Geraldton":{lat:-28.77,lng:114.61},"Carnarvon":{lat:-24.87,lng:113.66},
+  "Esperance":{lat:-33.86,lng:121.89},"Albany":{lat:-35.02,lng:117.88},
+  "Bunbury":{lat:-33.33,lng:115.64},"Margaret River":{lat:-33.95,lng:115.07},
+  "Swan Valley":{lat:-31.82,lng:116.01},"Manjimup":{lat:-34.24,lng:116.15},
+  "Northam":{lat:-31.65,lng:116.67},"Merredin":{lat:-31.48,lng:118.28},
+  "Kununurra":{lat:-15.77,lng:128.74},"Exmouth":{lat:-21.93,lng:114.13},
+  "Fremantle":{lat:-32.05,lng:115.75},"Osborne Park":{lat:-31.89,lng:115.83},
+  "Welshpool":{lat:-31.99,lng:115.94},"Bibra Lake":{lat:-32.10,lng:115.83},
+  "Balcatta":{lat:-31.87,lng:115.83},"Brendale":{lat:-27.31,lng:152.98},
+  "Bibra Lake":{lat:-32.10,lng:115.83},"Davenport":{lat:-20.74,lng:116.87},
+  // NT
+  "Katherine":{lat:-14.46,lng:132.27},"Katherine South":{lat:-14.48,lng:132.27},
+  "Tennant Creek":{lat:-19.65,lng:134.19},"Nhulunbuy":{lat:-12.18,lng:136.78},
+  "Berrimah":{lat:-12.43,lng:130.91},"Coolalinga":{lat:-12.49,lng:131.00},
+  "Winnellie":{lat:-12.43,lng:130.88},"East Arm":{lat:-12.47,lng:130.88},
+  "Roebuck":{lat:-17.97,lng:122.22},"Hale":{lat:-12.50,lng:131.00},
+  "Warumungu":{lat:-19.65,lng:134.19},
+  // TAS
+  "Launceston":{lat:-41.43,lng:147.14},"Devonport":{lat:-41.18,lng:146.35},
+  "Burnie":{lat:-41.05,lng:145.91},"Ulverstone":{lat:-41.17,lng:146.18},
+  "St Leonards":{lat:-41.46,lng:147.18},"Huonville":{lat:-43.03,lng:147.02},
+  "Dover":{lat:-43.31,lng:147.02},"Stanley":{lat:-40.76,lng:145.29},
+  "Cressy":{lat:-41.69,lng:147.08},"Cambridge":{lat:-42.83,lng:147.42},
+  // Other key agricultural areas
+  "Shepparton":{lat:-36.38,lng:145.40},"Robinvale":{lat:-34.59,lng:142.77},
+  "Swan Hill":{lat:-35.34,lng:143.55},"Echuca":{lat:-36.13,lng:144.75},
+  "Wangaratta":{lat:-36.36,lng:146.31},"Yarrawonga":{lat:-36.02,lng:146.00},
+  "Cobram":{lat:-35.92,lng:145.65},"Kyabram":{lat:-36.32,lng:145.05},
+  "Tatura":{lat:-36.44,lng:145.27},"Mooroopna":{lat:-36.40,lng:145.37},
+  "Leeton":{lat:-34.55,lng:146.40},"Narrandera":{lat:-34.75,lng:146.55},
+  "Hay":{lat:-34.51,lng:144.84},"Deniliquin":{lat:-35.53,lng:144.96},
+  "Moree":{lat:-29.47,lng:149.84},"Narrabri":{lat:-30.33,lng:149.78},
+  "Inverell":{lat:-29.78,lng:151.11},"Glen Innes":{lat:-29.73,lng:151.73},
+  "Mudgee":{lat:-32.60,lng:149.59},"Cowra":{lat:-33.83,lng:148.68},
+  "Forbes":{lat:-33.38,lng:148.00},"Parkes":{lat:-33.13,lng:148.17},
+  "Condobolin":{lat:-33.08,lng:147.15},"Nyngan":{lat:-31.56,lng:147.20},
+  "Bourke":{lat:-30.09,lng:145.94},"Wee Waa":{lat:-30.22,lng:149.43},
+  "Wingham":{lat:-31.86,lng:152.37},"Taree":{lat:-31.90,lng:152.46},
+  "Port Macquarie":{lat:-31.43,lng:152.91},"Kempsey":{lat:-31.08,lng:152.84},
+  "Grafton":{lat:-29.69,lng:152.93},"Casino":{lat:-28.87,lng:153.04},
+  "Kyogle":{lat:-28.62,lng:153.00},"Mullumbimby":{lat:-28.55,lng:153.50},
+  "Murwillumbah":{lat:-28.33,lng:153.40},"Tweed Heads":{lat:-28.18,lng:153.55},
+  "Woolgoolga":{lat:-30.11,lng:153.20},"Nambucca Heads":{lat:-30.64,lng:152.97},
+  "Macksville":{lat:-30.71,lng:152.92},"Dorrigo":{lat:-30.34,lng:152.72},
+  "Bellingen":{lat:-30.45,lng:152.90},"Wauchope":{lat:-31.46,lng:152.74},
+  "Gloucester":{lat:-31.98,lng:151.96},"Dungog":{lat:-32.40,lng:151.75},
+  "Muswellbrook":{lat:-32.27,lng:150.89},"Scone":{lat:-32.05,lng:150.87},
+  "Arno Bay":{lat:-33.92,lng:136.57},"Port Pirie":{lat:-33.19,lng:138.01},
+  "Kadina":{lat:-33.97,lng:137.72},"Wallaroo":{lat:-33.94,lng:137.63},
+  "Moonta":{lat:-34.07,lng:137.59},"Yorke Peninsula":{lat:-34.50,lng:137.60},
+  "Clare":{lat:-33.83,lng:138.62},"Burra":{lat:-33.69,lng:138.93},
+  "Kapunda":{lat:-34.34,lng:138.91},"Gawler":{lat:-34.60,lng:138.74},
+  "Victor Harbor":{lat:-35.55,lng:138.62},"Goolwa":{lat:-35.50,lng:138.78},
+  "Strathalbyn":{lat:-35.27,lng:138.89},"Tailem Bend":{lat:-35.25,lng:139.46},
+  "Keith":{lat:-36.10,lng:140.35},"Millicent":{lat:-37.60,lng:140.35},
+  "Penola":{lat:-37.37,lng:140.84},"Lucindale":{lat:-36.98,lng:140.37},
+  "Meningie":{lat:-35.69,lng:139.33},"Mannum":{lat:-34.91,lng:139.30},
+  "Blanchetown":{lat:-34.35,lng:139.61},"Waikerie":{lat:-34.18,lng:139.98},
+  "Loxton":{lat:-34.45,lng:140.57},"Barmera":{lat:-34.25,lng:140.47},
+  "Cobdogla":{lat:-34.26,lng:140.38},"Glossop":{lat:-34.27,lng:140.52},
+  "Mypolonga":{lat:-35.07,lng:139.34},"Jervois":{lat:-35.22,lng:139.51},
+  "Nildottie":{lat:-34.64,lng:139.55},"Walker Flat":{lat:-34.55,lng:139.47},
+  "Sedan":{lat:-34.57,lng:139.32},"Sandalwood":{lat:-34.39,lng:140.09},
+  "Pyap":{lat:-34.50,lng:140.45},"Qualco":{lat:-34.37,lng:140.33},
+  "Ramco":{lat:-34.33,lng:140.09},"Sunlands":{lat:-34.28,lng:139.92},
+  "Moorook":{lat:-34.28,lng:140.35},"Lyrup":{lat:-34.22,lng:140.63},
+  "Bugle Hut":{lat:-34.16,lng:140.68},"Monash":{lat:-34.25,lng:140.54},
+  "Paringa":{lat:-34.17,lng:140.78},
 };
 
-const AU_CITIES = [
-  "Sydney","Melbourne","Brisbane","Perth","Adelaide","Darwin","Hobart",
-  "Cairns","Townsville","Mackay","Rockhampton","Bundaberg","Toowoomba",
-  "Gold Coast","Sunshine Coast","Newcastle","Wollongong","Geelong",
-  "Ballarat","Bendigo","Launceston","Alice Springs","Katherine",
-  "Broome","Geraldton","Kalgoorlie","Port Hedland","Newman","Tom Price",
-  "Carnarvon","Margaret River","Albany","Esperance","Mount Isa",
-  "Longreach","Charleville","Roma","Emerald","Bowen","Stanthorpe",
-  "Mareeba","Atherton","Port Augusta","Coober Pedy","Whyalla",
-  "Dubbo","Orange","Broken Hill","Wagga Wagga","Albury","Cessnock","Singleton",
-];
-
-function haversine(lat1,lng1,lat2,lng2){
-  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
-  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+// Smart search: detect if input is a city name or employer name
+function detectSearchType(input, coords) {
+  if (!input || input.length < 2) return { type: "none" };
+  const lower = input.toLowerCase();
+  // Check if it matches a known city
+  const cityMatch = Object.keys(coords).find(city => 
+    city.toLowerCase() === lower || city.toLowerCase().startsWith(lower)
+  );
+  if (cityMatch && coords[cityMatch]) {
+    return { type: "city", city: cityMatch, coords: coords[cityMatch] };
+  }
+  // Check partial city match (3+ chars)
+  if (input.length >= 3) {
+    const partialCity = Object.keys(coords).find(city =>
+      city.toLowerCase().startsWith(lower)
+    );
+    if (partialCity) {
+      return { type: "city_partial", city: partialCity };
+    }
+  }
+  return { type: "employer", query: input };
 }
 
 async function copyToClipboard(text){
   try{await navigator.clipboard.writeText(text);return true;}
   catch{try{const el=document.createElement("input");el.style.cssText="position:fixed;opacity:0;top:0;left:0;";el.value=text;document.body.appendChild(el);el.focus();el.select();document.execCommand("copy");document.body.removeChild(el);return true;}catch{return false;}}
+}
+
+function haversine(lat1,lng1,lat2,lng2){
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
 }
 
 function CopyBtn({text}){
@@ -80,24 +220,19 @@ function CopyBtn({text}){
   );
 }
 
-// ─── Payment Modal ────────────────────────────────────────────────────────────
-function PaymentModal({onClose}){
+function PaymentModal({onClose, onFakePay}){
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:300,background:"rgba(26,26,24,0.7)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"jfFadeIn 0.2s ease"}}>
       <div onClick={e=>e.stopPropagation()} style={{background:C.bgCard,borderRadius:24,width:"100%",maxWidth:400,boxShadow:C.shadowLg,overflow:"hidden",animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
-        <div style={{background:`linear-gradient(135deg,#1a7a4a,#0d3d22)`,padding:"28px 24px",textAlign:"center"}}>
-          <div style={{fontSize:48,marginBottom:8}}>🦘</div>
+        {/* Header with proper logo */}
+        <div style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",padding:"28px 24px 24px",textAlign:"center",position:"relative"}}>
+          <div style={{width:64,height:64,background:"rgba(255,255,255,0.15)",borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",fontSize:36,margin:"0 auto 12px",border:"2px solid rgba(255,255,255,0.2)"}}>🦘</div>
           <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#fff",marginBottom:4}}>Unlock all contacts</div>
           <div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>One-time payment · Lifetime access</div>
         </div>
-        <div style={{padding:"24px"}}>
+        <div style={{padding:"20px 24px 24px"}}>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:20}}>
-            {[
-              ["📞","Direct phone numbers"],
-              ["✉️","Recruitment emails"],
-              ["🌐","Official websites"],
-              ["📍","Sort by proximity"],
-            ].map(([icon,label])=>(
+            {[["📞","Direct phone numbers"],["✉️","Recruitment emails"],["🌐","Official websites"],["📍","Sort by proximity"]].map(([icon,label])=>(
               <div key={label} style={{background:C.bgMuted,borderRadius:10,padding:"10px 12px",display:"flex",alignItems:"center",gap:8}}>
                 <span style={{fontSize:16}}>{icon}</span>
                 <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,color:C.text}}>{label}</span>
@@ -106,21 +241,22 @@ function PaymentModal({onClose}){
           </div>
           <div style={{textAlign:"center",marginBottom:16}}>
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:40,fontWeight:700,color:C.green,lineHeight:1}}>{PRICE}</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginTop:4}}>{JOB_DATA.length.toLocaleString()} employers · One-time payment</div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginTop:4}}>{JOB_DATA.length.toLocaleString()} employers · Lifetime access</div>
           </div>
-
-          {/* Coming soon state */}
-          <div style={{background:C.bgMuted,borderRadius:14,padding:"18px",textAlign:"center",marginBottom:12}}>
-            <div style={{fontSize:24,marginBottom:6}}>🔧</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:700,color:C.text,marginBottom:4}}>Payment coming soon</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,lineHeight:1.5}}>We're setting up secure payment.<br/>Leave your email to be notified when it's live.</div>
+          <div style={{background:C.bgMuted,borderRadius:14,padding:"16px",textAlign:"center",marginBottom:12}}>
+            <div style={{fontSize:20,marginBottom:6}}>🔧</div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,color:C.text,marginBottom:4}}>Payment coming soon</div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,lineHeight:1.5}}>We're setting up secure payment.<br/>Leave your email to be notified.</div>
           </div>
-
           <input type="email" placeholder="your@email.com" style={{width:"100%",padding:"12px 14px",borderRadius:10,border:`1.5px solid ${C.border}`,background:C.bgCard,fontSize:13,fontFamily:"'DM Sans',sans-serif",color:C.text,marginBottom:10,boxSizing:"border-box"}}/>
-          <button style={{width:"100%",padding:"14px",borderRadius:12,border:"none",background:C.green,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:10}}>
+          <button style={{width:"100%",padding:"14px",borderRadius:12,border:"none",background:C.green,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)"}}>
             Notify me when available
           </button>
-          <button onClick={onClose} style={{width:"100%",padding:"10px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:13,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
+          {/* Dev only fake pay button */}
+          <button onClick={onFakePay} style={{width:"100%",padding:"10px",borderRadius:10,border:`1.5px dashed ${C.green}`,background:"transparent",color:C.green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8}}>
+            🧪 [Dev] Simulate payment
+          </button>
+          <button onClick={onClose} style={{width:"100%",padding:"10px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
             Close
           </button>
         </div>
@@ -129,69 +265,57 @@ function PaymentModal({onClose}){
   );
 }
 
-// ─── Employer Detail Modal ────────────────────────────────────────────────────
 function EmployerModal({job, onClose, paid, onUnlock}){
   useEffect(()=>{
     const fn=e=>{if(e.key==="Escape")onClose();};
     document.addEventListener("keydown",fn);
     return()=>document.removeEventListener("keydown",fn);
   },[]);
-  const stateColor=STATE_COLORS[job.state]||"#888";
+  const sc=STATE_COLORS[job.state]||"#888";
   return(
-    <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:200,background:"rgba(26,26,24,0.6)",backdropFilter:"blur(8px)",display:"flex",alignItems:"flex-end",justifyContent:"center",padding:"0",animation:"jfFadeIn 0.2s ease"}}>
+    <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:200,background:"rgba(26,26,24,0.6)",backdropFilter:"blur(8px)",display:"flex",alignItems:"flex-end",justifyContent:"center",animation:"jfFadeIn 0.2s ease"}}>
       <div onClick={e=>e.stopPropagation()} style={{background:C.bgCard,borderRadius:"20px 20px 0 0",width:"100%",maxWidth:560,maxHeight:"82vh",overflowY:"auto",boxShadow:C.shadowLg,animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
-
-        {/* Header */}
-        <div style={{background:`linear-gradient(135deg,${stateColor}18,${stateColor}05)`,borderBottom:`1px solid ${C.border}`,padding:"20px 20px 16px",position:"sticky",top:0,background:C.bgCard,zIndex:10}}>
+        <div style={{borderBottom:`1px solid ${C.border}`,padding:"20px 20px 16px",position:"sticky",top:0,background:C.bgCard,zIndex:10}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
             <div style={{width:48,height:48,borderRadius:12,background:C.bgMuted,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0,border:`1px solid ${C.border}`}}>
               {SECTOR_ICONS[job.sector]||"🏢"}
             </div>
             <div style={{flex:1,minWidth:0}}>
               <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
-                <span style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.text,lineHeight:1.2}}>{job.name}</span>
-                {job.isNew&&<span style={{fontSize:9,fontWeight:700,color:"#fff",background:C.amber,borderRadius:5,padding:"2px 6px",flexShrink:0}}>NEW</span>}
+                <span style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.text}}>{job.name}</span>
+                {job.isNew&&<span style={{fontSize:9,fontWeight:700,color:"#fff",background:C.amber,borderRadius:5,padding:"2px 6px"}}>NEW</span>}
               </div>
               <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
                 <span style={{fontSize:11,color:C.teal,fontWeight:600}}>{job.sector}</span>
                 <span style={{fontSize:11,color:C.textFaint}}>· 88-day eligible</span>
-                <span style={{background:stateColor+"22",border:`1px solid ${stateColor}55`,borderRadius:6,padding:"2px 7px",fontSize:11,fontWeight:700,color:stateColor}}>{job.state}</span>
+                <span style={{background:sc+"22",border:`1px solid ${sc}55`,borderRadius:6,padding:"2px 7px",fontSize:11,fontWeight:700,color:sc}}>{job.state}</span>
               </div>
             </div>
-            <button onClick={onClose} style={{background:"transparent",border:"none",fontSize:20,cursor:"pointer",color:C.textFaint,padding:4,flexShrink:0,lineHeight:1}}>✕</button>
+            <button onClick={onClose} style={{background:"transparent",border:"none",fontSize:22,cursor:"pointer",color:C.textFaint,padding:4,flexShrink:0,lineHeight:1}}>✕</button>
           </div>
         </div>
-
         <div style={{padding:"16px 20px 32px"}}>
-
-          {/* Rating */}
           {job.score>0&&(
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,background:C.bgMuted,borderRadius:10,padding:"10px 14px"}}>
               <div style={{display:"flex",gap:2}}>
-                {[1,2,3,4,5].map(i=>(
-                  <span key={i} style={{fontSize:14,color:i<=Math.round(job.score)?"#f59e0b":"#e2e8f0"}}>★</span>
-                ))}
+                {[1,2,3,4,5].map(i=><span key={i} style={{fontSize:14,color:i<=Math.round(job.score)?"#f59e0b":"#e2e8f0"}}>★</span>)}
               </div>
               <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,color:C.text}}>{job.score}</span>
               {job.reviews>0&&<span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint}}>({job.reviews.toLocaleString()} reviews)</span>}
             </div>
           )}
-
-          {/* Location */}
           <div style={{background:C.bgMuted,borderRadius:10,padding:"12px 14px",marginBottom:12}}>
             <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.textFaint,letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,marginBottom:6}}>Location</div>
             <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
               <span style={{fontSize:16,marginTop:1}}>📍</span>
               <div>
                 <a href={`https://maps.google.com/?q=${encodeURIComponent((job.address?job.address+", ":"")+(job.city?job.city+", ":"")+job.state+", Australia")}`} target="_blank" rel="noopener noreferrer" style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:600,color:C.green,textDecoration:"none",display:"block"}}>
-                  {job.city||job.state} → View on map
+                  {job.city||job.state} → View on Google Maps
                 </a>
                 {job.address&&<div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginTop:2}}>{job.address}</div>}
               </div>
             </div>
           </div>
-
-          {/* Website */}
           {job.website&&(
             <a href={job.website} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:C.greenLight,border:`1px solid ${C.greenBorder}`,borderRadius:10,padding:"11px 14px",textDecoration:"none",marginBottom:12}}>
               <span style={{fontSize:16}}>🌐</span>
@@ -199,36 +323,27 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               <span style={{fontSize:12,color:C.green,flexShrink:0}}>→</span>
             </a>
           )}
-
-          {/* Contacts */}
-          <div style={{border:`1.5px solid ${paid?C.greenBorder:C.border}`,borderRadius:12,padding:"14px",marginBottom:paid?0:14,background:paid?C.greenLight+"40":C.bgMuted}}>
+          <div style={{border:`1.5px solid ${paid?C.greenBorder:C.border}`,borderRadius:12,padding:"14px",marginBottom:paid?0:14,background:paid?C.greenLight+"30":C.bgMuted}}>
             <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:paid?C.green:C.textFaint,letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,marginBottom:12}}>
               {paid?"✓ Direct contacts":"🔒 Contacts locked"}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
               <span style={{fontSize:16,flexShrink:0}}>📞</span>
               {paid?(
-                <>
-                  <a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}}>{job.phone||"—"}</a>
-                  {job.phone&&<CopyBtn text={job.phone}/>}
-                </>
+                <><a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}}>{job.phone||"—"}</a>{job.phone&&<CopyBtn text={job.phone}/>}</>
               ):(
-                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.textMid,filter:"blur(5px)",userSelect:"none",flex:1,fontWeight:600}}>{(job.phone||"+61 x xxxx xxxx")}</span>
+                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.textMid,filter:"blur(5px)",userSelect:"none",flex:1,fontWeight:600}}>{job.phone||"+61 x xxxx xxxx"}</span>
               )}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <span style={{fontSize:16,flexShrink:0}}>✉️</span>
               {paid?(
-                <>
-                  <a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}}>{job.email||"—"}</a>
-                  {job.email&&<CopyBtn text={job.email}/>}
-                </>
+                <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}}>{job.email||"—"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
               ):(
                 <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,filter:"blur(5px)",userSelect:"none",flex:1}}>{job.email||"xxxxx@employer.com.au"}</span>
               )}
             </div>
           </div>
-
           {!paid&&(
             <button onClick={onUnlock} style={{width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)"}}>
               🔓 Unlock all contacts — {PRICE}
@@ -240,17 +355,18 @@ function EmployerModal({job, onClose, paid, onUnlock}){
   );
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function JobFinder(){
   const[sector,setSector]=useState(null);
   const[stateF,setStateF]=useState(null);
   const[paid,setPaid]=useState(false);
   const[selectedJob,setSelectedJob]=useState(null);
   const[showPayment,setShowPayment]=useState(false);
-  const[cityInput,setCityInput]=useState("");
-  const[cityCoords,setCityCoords]=useState(null);
-  const[suggestions,setSuggestions]=useState([]);
   const[search,setSearch]=useState("");
+  const[cityCoords,setCityCoords]=useState(null);
+  const[cityName,setCityName]=useState("");
+  const[suggestions,setSuggestions]=useState([]);
+  const[searchMode,setSearchMode]=useState("none"); // "city" | "employer" | "none"
+  const searchRef=useRef();
 
   useEffect(()=>{
     const s=document.createElement("style");s.id="jf-styles";
@@ -270,54 +386,79 @@ export default function JobFinder(){
     return()=>document.getElementById("jf-styles")?.remove();
   },[]);
 
-  useEffect(()=>{
-    if(cityInput.length<2){setSuggestions([]);return;}
-    const q=cityInput.toLowerCase();
-    setSuggestions(AU_CITIES.filter(c=>c.toLowerCase().startsWith(q)).slice(0,5));
-  },[cityInput]);
-
-  const selectCity=useCallback((city)=>{
-    setCityInput(city);setSuggestions([]);
-    const c=CITY_COORDS[city];if(c)setCityCoords(c);
+  // Smart search handler
+  const handleSearchChange=useCallback((val)=>{
+    setSearch(val);
+    if(!val||val.length<2){setSuggestions([]);setSearchMode("none");setCityCoords(null);setCityName("");return;}
+    const lower=val.toLowerCase();
+    // Find matching cities
+    const cityMatches=Object.keys(CITY_COORDS).filter(city=>
+      city.toLowerCase().startsWith(lower)
+    ).slice(0,6);
+    if(cityMatches.length>0){
+      setSuggestions(cityMatches);
+      setSearchMode("city_suggest");
+    } else {
+      setSuggestions([]);
+      setSearchMode("employer");
+      setCityCoords(null);
+      setCityName("");
+    }
   },[]);
 
-  const filtered=JOB_DATA.filter(j=>{
+  const selectCity=useCallback((city)=>{
+    setSearch(city);
+    setSuggestions([]);
+    setCityCoords(CITY_COORDS[city]);
+    setCityName(city);
+    setSearchMode("city");
+  },[]);
+
+  const clearSearch=useCallback(()=>{
+    setSearch("");setSuggestions([]);setSearchMode("none");setCityCoords(null);setCityName("");
+  },[]);
+
+  // Filter & sort
+  const filtered=useMemo(()=>JOB_DATA.filter(j=>{
     if(sector&&j.sector!==sector)return false;
     if(stateF&&j.state!==stateF)return false;
-    if(search){
+    if(searchMode==="employer"&&search){
       const q=search.toLowerCase();
       if(!j.name.toLowerCase().includes(q)&&!(j.city||"").toLowerCase().includes(q))return false;
     }
     return true;
-  });
+  }),[sector,stateF,search,searchMode]);
 
-  const sorted=cityCoords
-    ?[...filtered].sort((a,b)=>{
+  const sorted=useMemo(()=>{
+    if(cityCoords){
+      return [...filtered].sort((a,b)=>{
         const ca=CITY_COORDS[a.city],cb=CITY_COORDS[b.city];
         if(!ca&&!cb)return 0;if(!ca)return 1;if(!cb)return-1;
         return haversine(cityCoords.lat,cityCoords.lng,ca.lat,ca.lng)-haversine(cityCoords.lat,cityCoords.lng,cb.lat,cb.lng);
-      })
-    :[...filtered].sort((a,b)=>{
-        const ss=(STATE_ORDER[a.state]??99)-(STATE_ORDER[b.state]??99);
-        if(ss!==0)return ss;
-        return(b.score||0)-(a.score||0);
       });
+    }
+    return [...filtered].sort((a,b)=>{
+      const ss=(STATE_ORDER[a.state]??99)-(STATE_ORDER[b.state]??99);
+      if(ss!==0)return ss;
+      return(b.score||0)-(a.score||0);
+    });
+  },[filtered,cityCoords]);
 
   const visible=paid?sorted:sorted.slice(0,FREE_LIMIT);
   const showWall=!paid&&sorted.length>FREE_LIMIT;
   const lockedCount=sorted.length-FREE_LIMIT;
 
-  const sectorCounts=SECTORS.reduce((acc,s)=>{
+  const sectorCounts=useMemo(()=>SECTORS.reduce((acc,s)=>{
     acc[s]=JOB_DATA.filter(j=>j.sector===s&&(!stateF||j.state===stateF)).length;
     return acc;
-  },{});
+  },{}),[stateF]);
 
-  const getDistLabel=(job)=>{
+  const getDistLabel=useCallback((job)=>{
     if(!cityCoords)return null;
     const c=CITY_COORDS[job.city];if(!c)return null;
     const d=haversine(cityCoords.lat,cityCoords.lng,c.lat,c.lng);
-    return d===0?"0km":`${d}km`;
-  };
+    return d===0?"nearby":`${d}km`;
+  },[cityCoords]);
 
   return(
     <div style={{background:C.bg,minHeight:"100vh",fontFamily:"'DM Sans',sans-serif"}}>
@@ -326,24 +467,21 @@ export default function JobFinder(){
         <EmployerModal job={selectedJob} onClose={()=>setSelectedJob(null)} paid={paid} onUnlock={()=>{setSelectedJob(null);setShowPayment(true);}}/>
       )}
       {showPayment&&(
-        <PaymentModal onClose={()=>setShowPayment(false)}/>
+        <PaymentModal onClose={()=>setShowPayment(false)} onFakePay={()=>{setPaid(true);setShowPayment(false);}}/>
       )}
 
       {/* Hero */}
       <div style={{background:"linear-gradient(135deg,#1a7a4a 0%,#0d3d22 100%)",padding:"22px 18px 20px"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
           <div>
-            <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>
-              Find your farm job.
-            </div>
+            <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>Find your farm job.</div>
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontStyle:"italic",color:"rgba(255,255,255,0.7)"}}>Stay a second year.</div>
           </div>
-          {!paid&&(
+          {!paid?(
             <button onClick={()=>setShowPayment(true)} className="jf-cta" style={{background:"rgba(255,255,255,0.15)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:10,padding:"8px 14px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.2s",backdropFilter:"blur(4px)",flexShrink:0}}>
               🔓 Unlock {PRICE}
             </button>
-          )}
-          {paid&&(
+          ):(
             <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>✓ Full access</div>
           )}
         </div>
@@ -359,11 +497,42 @@ export default function JobFinder(){
 
       <div style={{maxWidth:580,margin:"0 auto",padding:"14px 14px 140px"}}>
 
-        {/* Search */}
+        {/* Smart search bar */}
         <div style={{marginBottom:12,position:"relative"}}>
-          <input className="jf-input" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by employer or city…"
-            style={{width:"100%",padding:"11px 36px 11px 14px",borderRadius:11,border:`1.5px solid ${C.border}`,background:C.bgCard,fontSize:13,fontFamily:"'DM Sans',sans-serif",color:C.text,boxSizing:"border-box"}}/>
-          {search&&<button onClick={()=>setSearch("")} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",fontSize:15,color:C.textFaint,cursor:"pointer"}}>✕</button>}
+          <div style={{position:"relative"}}>
+            <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:15,pointerEvents:"none"}}>
+              {searchMode==="city"?"📍":searchMode==="employer"?"🔍":"🔍"}
+            </span>
+            <input
+              ref={searchRef}
+              className="jf-input"
+              value={search}
+              onChange={e=>handleSearchChange(e.target.value)}
+              placeholder="Search by employer or city…"
+              style={{width:"100%",padding:"12px 36px 12px 38px",borderRadius:12,border:`1.5px solid ${searchMode==="city"?C.green:C.border}`,background:C.bgCard,fontSize:13,fontFamily:"'DM Sans',sans-serif",color:C.text,boxSizing:"border-box",transition:"border-color 0.2s"}}
+            />
+            {search&&<button onClick={clearSearch} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",fontSize:16,color:C.textFaint,cursor:"pointer"}}>✕</button>}
+          </div>
+
+          {/* City suggestions dropdown */}
+          {suggestions.length>0&&(
+            <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:12,boxShadow:C.shadowLg,zIndex:50,overflow:"hidden"}}>
+              <div style={{padding:"8px 12px 4px",fontSize:9,color:C.textFaint,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600}}>Cities nearby</div>
+              {suggestions.map(city=>(
+                <div key={city} onClick={()=>selectCity(city)} style={{padding:"10px 14px",fontSize:13,color:C.text,cursor:"pointer",display:"flex",alignItems:"center",gap:8,borderTop:`1px solid ${C.border}`}} onMouseEnter={e=>e.currentTarget.style.background=C.bgMuted} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  <span style={{fontSize:13}}>📍</span>
+                  <span style={{fontWeight:500}}>{city}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Active city indicator */}
+          {searchMode==="city"&&cityCoords&&(
+            <div style={{marginTop:6,fontSize:11,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+              <span>✓</span> Sorted by distance from {cityName}
+            </div>
+          )}
         </div>
 
         {/* Sector */}
@@ -392,26 +561,6 @@ export default function JobFinder(){
           </div>
         </div>
 
-        {/* Distance */}
-        <div style={{marginBottom:14,position:"relative"}}>
-          <div style={{fontSize:9,color:C.textFaint,letterSpacing:"0.14em",textTransform:"uppercase",fontWeight:600,marginBottom:7}}>📍 Sort by distance from</div>
-          <div style={{position:"relative"}}>
-            <input className="jf-input" value={cityInput} onChange={e=>setCityInput(e.target.value)} placeholder="Your city… e.g. Brisbane, Perth"
-              style={{width:"100%",padding:"10px 36px 10px 14px",borderRadius:10,border:`1.5px solid ${C.border}`,background:C.bgCard,fontSize:13,fontFamily:"'DM Sans',sans-serif",color:C.text,boxSizing:"border-box"}}/>
-            {cityInput&&<button onClick={()=>{setCityInput("");setCityCoords(null);setSuggestions([]);}} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",fontSize:15,color:C.textFaint,cursor:"pointer"}}>✕</button>}
-          </div>
-          {suggestions.length>0&&(
-            <div style={{position:"absolute",top:"calc(100% - 4px)",left:0,right:0,background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:10,boxShadow:C.shadowLg,zIndex:20,overflow:"hidden"}}>
-              {suggestions.map(city=>(
-                <div key={city} onClick={()=>selectCity(city)} style={{padding:"10px 14px",fontSize:13,color:C.text,cursor:"pointer",borderBottom:`1px solid ${C.border}`}} onMouseEnter={e=>e.currentTarget.style.background=C.bgMuted} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                  📍 {city}
-                </div>
-              ))}
-            </div>
-          )}
-          {cityCoords&&<div style={{fontSize:11,color:C.green,fontWeight:600,marginTop:5}}>✓ Sorted by distance from {cityInput}</div>}
-        </div>
-
         {/* Count */}
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,background:C.bgMuted,borderRadius:10,padding:"10px 14px"}}>
           <span style={{fontSize:13}}>📋</span>
@@ -419,6 +568,9 @@ export default function JobFinder(){
             <span style={{color:C.green,fontFamily:"'Playfair Display',serif",fontSize:18}}>{sorted.length}</span>
             {" "}employer{sorted.length!==1?"s":""} found
           </span>
+          {!paid&&sorted.length>FREE_LIMIT&&(
+            <span style={{marginLeft:"auto",fontSize:10,color:C.textFaint}}>{FREE_LIMIT} free · {lockedCount} locked</span>
+          )}
           {paid&&cityCoords&&<span style={{marginLeft:"auto",fontSize:10,color:C.green,fontWeight:600}}>📍 By proximity</span>}
         </div>
 
@@ -477,7 +629,6 @@ export default function JobFinder(){
             {/* Paywall */}
             {showWall&&(
               <div style={{marginTop:12}}>
-                {/* Blurred preview */}
                 <div style={{position:"relative",overflow:"hidden",borderRadius:"14px 14px 0 0",border:`1px solid ${C.border}`,borderBottom:"none"}}>
                   {sorted.slice(FREE_LIMIT,FREE_LIMIT+3).map((job,i)=>(
                     <div key={i} style={{background:C.bgCard,padding:"14px 15px",borderBottom:i<2?`1px solid ${C.border}`:"none",filter:"blur(3px)",opacity:0.7,userSelect:"none"}}>
@@ -491,15 +642,11 @@ export default function JobFinder(){
                       </div>
                     </div>
                   ))}
-                  <div style={{position:"absolute",bottom:0,left:0,right:0,height:80,background:`linear-gradient(to bottom,transparent,${C.bg})`}}/>
+                  <div style={{position:"absolute",bottom:0,left:0,right:0,height:60,background:`linear-gradient(to bottom,transparent,${C.bg})`}}/>
                 </div>
-
-                {/* CTA */}
                 <div style={{background:C.bgCard,border:`1px solid ${C.border}`,borderTop:"none",borderRadius:"0 0 18px 18px",padding:"20px",textAlign:"center"}}>
                   <div style={{fontSize:28,marginBottom:6}}>🔒</div>
-                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.text,marginBottom:4}}>
-                    +{lockedCount} more employers
-                  </div>
+                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.text,marginBottom:4}}>+{lockedCount} more employers</div>
                   <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:16,lineHeight:1.6}}>
                     Phone · Email · Website for every employer.<br/>
                     <strong style={{color:C.text}}>One call = your 88 days sorted.</strong>
