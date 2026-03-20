@@ -1,4 +1,4 @@
-const ANTHROPIC_API_KEY = "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";
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
