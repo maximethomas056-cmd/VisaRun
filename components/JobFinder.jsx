@@ -12,7 +12,7 @@ const C = {
 };
 
 const FREE_LIMIT = 5;
-const PRICE = "A$24.90";
+const PRICE = "$24.90 AUD";
 
 const SECTORS = ["All","Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry","Other"];
 const STATES  = ["QLD","WA","NSW","VIC","TAS","NT","SA"];
