@@ -94,8 +94,8 @@ export default function App() {
 
       {/* ── Content ── */}
       <div>
-        {activeTab === "visa" && <VisaRun />}
-        {activeTab === "jobs" && <JobFinder />}
+        {activeTab === "visa" && <VisaRun onSwitchTab={setActiveTab}/>}
+        {activeTab === "jobs" && <JobFinder onSwitchTab={setActiveTab}/>}
       </div>
 
     </div>

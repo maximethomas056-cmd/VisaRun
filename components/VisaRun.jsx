@@ -543,7 +543,7 @@ function Toast({msg,ok}){
   );
 }
 
-export default function VisaRunApp(){
+export default function VisaRunApp({onSwitchTab}){
   const[entries,setEntries]=useState([]);
   const[goal,setGoal]=useState(88);
   const[rooJump,setRooJump]=useState(false);
@@ -657,6 +657,22 @@ export default function VisaRunApp(){
       <FiscalBanner/>
       <HeroProgress totalDays={totalDays} goal={goal} onGoalChange={setGoal} rooJump={rooJump}/>
       <StatCards totals={totals}/>
+
+      {/* Find a Job CTA banner */}
+      {onSwitchTab&&(
+        <div style={{maxWidth:600,margin:"0 auto",padding:"0 20px 4px"}}>
+          <div onClick={()=>onSwitchTab("jobs")} style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 4px 16px rgba(26,122,74,0.25)",marginBottom:4}}>
+            <div style={{fontSize:28}}>🔍</div>
+            <div style={{flex:1}}>
+              <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"#fff",marginBottom:2}}>Ready to find your farm job?</div>
+              <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"rgba(255,255,255,0.7)"}}>2,167+ direct employer contacts · Phone & email</div>
+            </div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,color:"#fff",background:"rgba(255,255,255,0.15)",borderRadius:8,padding:"6px 12px",border:"1px solid rgba(255,255,255,0.2)",flexShrink:0}}>
+              Browse →
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{maxWidth:600,margin:"0 auto",padding:"0 20px 40px"}}>
         <input ref={fileRef} type="file" accept=".pdf,image/*" multiple style={{display:"none"}} onChange={e=>processFiles(Array.from(e.target.files))}/>

@@ -355,7 +355,7 @@ function EmployerModal({job, onClose, paid, onUnlock}){
   );
 }
 
-export default function JobFinder(){
+export default function JobFinder({onSwitchTab}){
   const[sector,setSector]=useState(null);
   const[stateF,setStateF]=useState(null);
   const[paid,setPaid]=useState(false);
@@ -365,8 +365,19 @@ export default function JobFinder(){
   const[cityCoords,setCityCoords]=useState(null);
   const[cityName,setCityName]=useState("");
   const[suggestions,setSuggestions]=useState([]);
-  const[searchMode,setSearchMode]=useState("none"); // "city" | "employer" | "none"
+  const[showSavedOnly,setShowSavedOnly]=useState(false);
+  const[saved,setSaved]=useState(()=>{try{return JSON.parse(localStorage.getItem("vr_saved_jobs")||"[]");}catch{return[];}});
+  const[searchMode,setSearchMode]=useState("none");
   const searchRef=useRef();
+
+  const toggleSave=useCallback((jobName,e)=>{
+    e.stopPropagation();
+    setSaved(prev=>{
+      const next=prev.includes(jobName)?prev.filter(n=>n!==jobName):[...prev,jobName];
+      try{localStorage.setItem("vr_saved_jobs",JSON.stringify(next));}catch{}
+      return next;
+    });
+  },[]);
 
   useEffect(()=>{
     const s=document.createElement("style");s.id="jf-styles";
@@ -420,6 +431,7 @@ export default function JobFinder(){
 
   // Filter & sort
   const filtered=useMemo(()=>JOB_DATA.filter(j=>{
+    if(showSavedOnly&&!saved.includes(j.name))return false;
     if(sector&&sector!=="All"){
       if(sector==="Other"){
         const eligible=["Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry"];
@@ -434,7 +446,7 @@ export default function JobFinder(){
       if(!j.name.toLowerCase().includes(q)&&!(j.city||"").toLowerCase().includes(q))return false;
     }
     return true;
-  }),[sector,stateF,search,searchMode]);
+  }),[sector,stateF,search,searchMode,showSavedOnly,saved]);
 
   const sorted=useMemo(()=>{
     if(cityCoords){
@@ -492,11 +504,15 @@ export default function JobFinder(){
             <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>✓ Full access</div>
           )}
         </div>
-        <div style={{display:"flex",gap:20}}>
-          {[[`${JOB_DATA.length.toLocaleString()}+`,"Employers"],["8","Sectors"],["7","States"]].map(([val,label])=>(
-            <div key={label}>
-              <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#fff"}}>{val}</div>
-              <div style={{fontSize:9,color:"rgba(255,255,255,0.5)",letterSpacing:"0.06em",textTransform:"uppercase"}}>{label}</div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          {[
+            ["📞","Direct phone"],
+            ["✉️","Recruitment email"],
+            ["🗺️","All 7 states"],
+          ].map(([icon,label])=>(
+            <div key={label} style={{display:"flex",alignItems:"center",gap:5,background:"rgba(255,255,255,0.12)",borderRadius:8,padding:"5px 10px",border:"1px solid rgba(255,255,255,0.15)"}}>
+              <span style={{fontSize:12}}>{icon}</span>
+              <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.9)"}}>{label}</span>
             </div>
           ))}
         </div>
@@ -567,17 +583,24 @@ export default function JobFinder(){
           </div>
         </div>
 
-        {/* Count */}
+        {/* Count + Saved toggle */}
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,background:C.bgMuted,borderRadius:10,padding:"10px 14px"}}>
           <span style={{fontSize:13}}>📋</span>
           <span style={{fontSize:13,fontWeight:600,color:C.text}}>
             <span style={{color:C.green,fontFamily:"'Playfair Display',serif",fontSize:18}}>{sorted.length}</span>
             {" "}employer{sorted.length!==1?"s":""} found
           </span>
-          {!paid&&sorted.length>FREE_LIMIT&&(
-            <span style={{marginLeft:"auto",fontSize:10,color:C.textFaint}}>{FREE_LIMIT} free · {lockedCount} locked</span>
-          )}
-          {paid&&cityCoords&&<span style={{marginLeft:"auto",fontSize:10,color:C.green,fontWeight:600}}>📍 By proximity</span>}
+          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6}}>
+            {saved.length>0&&(
+              <button onClick={()=>setShowSavedOnly(p=>!p)} style={{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:7,border:`1.5px solid ${showSavedOnly?"#f59e0b":C.border}`,background:showSavedOnly?"#fef9ec":"transparent",color:showSavedOnly?"#b45309":C.textFaint,fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s"}}>
+                ⭐ {saved.length}
+              </button>
+            )}
+            {!paid&&sorted.length>FREE_LIMIT&&(
+              <span style={{fontSize:10,color:C.textFaint}}>{FREE_LIMIT} free · {lockedCount} locked</span>
+            )}
+            {paid&&cityCoords&&<span style={{fontSize:10,color:C.green,fontWeight:600}}>📍 By proximity</span>}
+          </div>
         </div>
 
         {/* Zero results */}
@@ -621,8 +644,13 @@ export default function JobFinder(){
                         </div>
                       </div>
                       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4,flexShrink:0}}>
-                        <span style={{background:sc+"22",border:`1px solid ${sc}55`,borderRadius:7,padding:"3px 8px",fontSize:11,fontWeight:700,color:sc}}>{job.state}</span>
-                        {dist&&<span style={{fontSize:10,color:C.green,fontWeight:700}}>{dist}</span>}
+                        <div style={{display:"flex",alignItems:"center",gap:6}}>
+                          <button onClick={(e)=>toggleSave(job.name,e)} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,padding:2,lineHeight:1,color:saved.includes(job.name)?"#f59e0b":C.textFaint,transition:"all 0.15s"}} title={saved.includes(job.name)?"Remove from saved":"Save"}>
+                            {saved.includes(job.name)?"⭐":"☆"}
+                          </button>
+                          <span style={{background:sc+"22",border:`1px solid ${sc}55`,borderRadius:7,padding:"3px 8px",fontSize:11,fontWeight:700,color:sc}}>{job.state}</span>
+                        </div>
+                        {dist&&<span style={{fontSize:10,color:C.green,fontWeight:700,textAlign:"right"}}>{dist}</span>}
                       </div>
                     </div>
                     {/* Location row */}
