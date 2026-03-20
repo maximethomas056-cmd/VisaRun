@@ -14,12 +14,12 @@ const C = {
 const FREE_LIMIT = 5;
 const PRICE = "A$24.90";
 
-const SECTORS = ["Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry"];
+const SECTORS = ["All","Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry","Other"];
 const STATES  = ["QLD","WA","NSW","VIC","TAS","NT","SA"];
 const STATE_ORDER = {QLD:0,WA:1,NSW:2,VIC:3,TAS:4,NT:5,SA:6};
 
 const SECTOR_ICONS = {
-  Farm:"🌾", Mine:"⛏️", Construction:"🏗️", Roadhouse:"🛣️",
+  All:"✦", Farm:"🌾", Mine:"⛏️", Construction:"🏗️", Roadhouse:"🛣️",
   Solar:"☀️", Fish:"🐟", Abattoir:"🥩", Forestry:"🌲",
   Other:"🏢", Hostel:"🏨", Recruitment:"👥",
 };
@@ -420,7 +420,14 @@ export default function JobFinder(){
 
   // Filter & sort
   const filtered=useMemo(()=>JOB_DATA.filter(j=>{
-    if(sector&&j.sector!==sector)return false;
+    if(sector&&sector!=="All"){
+      if(sector==="Other"){
+        const eligible=["Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry"];
+        if(eligible.includes(j.sector))return false;
+      } else {
+        if(j.sector!==sector)return false;
+      }
+    }
     if(stateF&&j.state!==stateF)return false;
     if(searchMode==="employer"&&search){
       const q=search.toLowerCase();
@@ -540,11 +547,10 @@ export default function JobFinder(){
           <div style={{fontSize:9,color:C.textFaint,letterSpacing:"0.14em",textTransform:"uppercase",fontWeight:600,marginBottom:7}}>Sector</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
             {SECTORS.map(s=>{
-              const active=sector===s;
+              const active=sector===s||(s==="All"&&!sector);
               return(
-                <button key={s} className="jf-chip" onClick={()=>setSector(sector===s?null:s)} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${active?C.green:C.border}`,background:active?C.green:C.bgCard,color:active?"#fff":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                <button key={s} className="jf-chip" onClick={()=>setSector(s==="All"?null:sector===s?null:s)} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${active?C.green:C.border}`,background:active?C.green:C.bgCard,color:active?"#fff":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
                   {SECTOR_ICONS[s]} {s}
-                  <span style={{fontSize:10,background:active?"rgba(255,255,255,0.2)":C.bgMuted,color:active?"#fff":C.textFaint,borderRadius:5,padding:"1px 5px",fontWeight:700}}>{sectorCounts[s]||0}</span>
                 </button>
               );
             })}
@@ -597,6 +603,7 @@ export default function JobFinder(){
                 return(
                   <div key={job.name+i} className="jf-card" onClick={()=>setSelectedJob(job)}
                     style={{background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:14,padding:"14px 15px",boxShadow:C.shadow,animation:`jfRowIn 0.3s ease ${Math.min(i,8)*0.04}s both`}}>
+                    {/* Top row */}
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
                       <div style={{width:40,height:40,borderRadius:10,background:C.bgMuted,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>
                         {SECTOR_ICONS[job.sector]||"🏢"}
@@ -608,7 +615,9 @@ export default function JobFinder(){
                         </div>
                         <div style={{display:"flex",alignItems:"center",gap:6}}>
                           <span style={{fontSize:11,color:C.teal,fontWeight:600}}>{job.sector}</span>
-                          {job.score>0&&<span style={{fontSize:10,color:C.textFaint}}>★ {job.score}</span>}
+                          {job.score>0&&(
+                            <span style={{fontSize:10,color:"#f59e0b",fontWeight:600}}>★ {job.score}{job.reviews>0&&<span style={{color:C.textFaint,fontWeight:400}}> ({job.reviews})</span>}</span>
+                          )}
                         </div>
                       </div>
                       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4,flexShrink:0}}>
@@ -616,11 +625,20 @@ export default function JobFinder(){
                         {dist&&<span style={{fontSize:10,color:C.green,fontWeight:700}}>{dist}</span>}
                       </div>
                     </div>
-                    <div style={{display:"flex",alignItems:"center",gap:8,background:C.bgMuted,borderRadius:8,padding:"7px 10px"}}>
-                      <span style={{fontSize:12}}>📍</span>
-                      <span style={{fontSize:12,fontWeight:500,color:C.textMid,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.city||job.state}{job.address?` · ${job.address}`:""}</span>
-                      <span style={{fontSize:11,color:C.teal,fontWeight:600,flexShrink:0}}>View →</span>
+                    {/* Location row */}
+                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:job.website?6:0}}>
+                      <span style={{fontSize:11}}>📍</span>
+                      <span style={{fontSize:11,fontWeight:500,color:C.textMid,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.city||job.state}{job.address?` · ${job.address}`:""}</span>
+                      <a href={`https://maps.google.com/?q=${encodeURIComponent((job.city||job.state)+", Australia")}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:10,color:C.teal,fontWeight:600,textDecoration:"none",flexShrink:0}}>Map →</a>
                     </div>
+                    {/* Website row */}
+                    {job.website&&(
+                      <div style={{display:"flex",alignItems:"center",gap:6,background:C.greenLight,borderRadius:8,padding:"6px 10px",border:`1px solid ${C.greenBorder}`}}>
+                        <span style={{fontSize:11}}>🌐</span>
+                        <a href={job.website} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:C.green,fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textDecoration:"none"}}>{job.website.replace(/https?:\/\/(www\.)?/,"")}</a>
+                        <span style={{fontSize:10,color:C.green,flexShrink:0}}>→</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}

@@ -291,7 +291,7 @@ function FiscalBanner(){
   return(
     <div style={{background:C.bgCard,borderBottom:`1px solid ${C.border}`,padding:"7px 20px",display:"flex",alignItems:"center",gap:12}}>
       <span style={{fontSize:13}}>📅</span>
-      <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,color:C.text,whiteSpace:"nowrap"}}>FY {fyStartYear}–{fyEndYear}</span>
+      <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,color:C.text,whiteSpace:"nowrap"}}>Australian Tax Year · {fyStartYear}–{fyEndYear}</span>
       <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,whiteSpace:"nowrap"}}>{fmtShort(fyStart)} → {fmtShort(fyEnd)}</span>
       <div style={{flex:1,height:4,background:C.border,borderRadius:99,overflow:"hidden",minWidth:40}}>
         <div style={{height:"100%",width:`${pct*100}%`,background:`linear-gradient(90deg,${C.teal},#34d399)`,borderRadius:99}}/>
@@ -482,7 +482,7 @@ function Modal({draft,filename,onConfirm,onDismiss,editMode=false}){
             </div>
             <div style={{display:"flex",gap:10}}>
               <button onClick={onDismiss} style={{flex:1,padding:"12px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:13}}>Ignore</button>
-              <button onClick={()=>setStep("details")} style={{flex:1,padding:"12px",borderRadius:10,border:`1px solid ${C.border}`,background:C.bgMuted,color:C.textMid,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:12}}>Edit manually</button>
+              <button onClick={()=>setStep("details")} style={{flex:1,padding:"12px",borderRadius:10,border:`1.5px solid ${C.teal}`,background:C.bgCard,color:C.teal,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:12,fontWeight:600}}>Edit manually</button>
               <button onClick={handleConfirm} style={{flex:2,padding:"12px",borderRadius:10,border:"none",background:C.green,color:"#fff",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:600}}>Confirm ✓</button>
             </div>
           </>
