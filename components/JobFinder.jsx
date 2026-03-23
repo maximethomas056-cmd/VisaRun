@@ -220,7 +220,45 @@ function CopyBtn({text}){
   );
 }
 
-function PaymentModal({onClose, onFakePay}){
+function EmailModal({onClose, onCheck, checking, error}){
+  const[email,setEmail]=useState("");
+  const handleSubmit=()=>{if(email.includes("@"))onCheck(email);};
+  return(
+    <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:300,background:"rgba(26,26,24,0.7)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"jfFadeIn 0.2s ease"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:24,width:"100%",maxWidth:380,boxShadow:"0 8px 40px rgba(0,0,0,0.14)",overflow:"hidden",animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
+        <div style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",padding:"24px 24px 20px",textAlign:"center"}}>
+          <div style={{fontSize:40,marginBottom:8}}>🦘</div>
+          <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",marginBottom:4}}>Access your contacts</div>
+          <div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>Enter the email you used to pay</div>
+        </div>
+        <div style={{padding:"24px"}}>
+          <input
+            type="email"
+            value={email}
+            onChange={e=>setEmail(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
+            placeholder="your@email.com"
+            autoFocus
+            style={{width:"100%",padding:"13px 16px",borderRadius:10,border:"1.5px solid #e8e3d9",fontFamily:"'DM Sans',sans-serif",fontSize:14,marginBottom:12,boxSizing:"border-box",outline:"none"}}
+          />
+          {error&&<div style={{color:"#dc2626",fontSize:12,marginBottom:10,textAlign:"center"}}>{error}</div>}
+          <button
+            onClick={handleSubmit}
+            disabled={checking||!email.includes("@")}
+            style={{width:"100%",padding:"14px",borderRadius:12,border:"none",background:checking?"#9a9488":"#1a7a4a",color:"#fff",fontSize:14,fontWeight:700,cursor:checking?"not-allowed":"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:10}}
+          >
+            {checking?"Checking...":"Unlock Access →"}
+          </button>
+          <button onClick={onClose} style={{width:"100%",padding:"10px",borderRadius:10,border:"1px solid #e8e3d9",background:"transparent",color:"#5a5850",fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PaymentModal({onClose, onAlreadyPaid}){
   const STRIPE_URL = "https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00";
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:300,background:"rgba(26,26,24,0.7)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"jfFadeIn 0.2s ease"}}>
@@ -251,8 +289,8 @@ function PaymentModal({onClose, onFakePay}){
               <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
             ))}
           </div>
-          <button onClick={onFakePay} style={{width:"100%",padding:"10px",borderRadius:10,border:`1.5px dashed ${C.border}`,background:"transparent",color:C.textFaint,fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8}}>
-            Already paid? Click here to unlock
+          <button onClick={onAlreadyPaid} style={{width:"100%",padding:"10px",borderRadius:10,border:`1.5px dashed ${C.border}`,background:"transparent",color:C.textFaint,fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8}}>
+            Already paid? Enter your email to unlock
           </button>
           <button onClick={onClose} style={{width:"100%",padding:"10px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
             Close
@@ -364,26 +402,63 @@ export default function JobFinder({onSwitchTab}){
   const[cityName,setCityName]=useState("");
   const[suggestions,setSuggestions]=useState([]);
   const[showSavedOnly,setShowSavedOnly]=useState(false);
-  const[saved,setSaved]=useState([]); // start empty, load client-side
+  const[saved,setSaved]=useState([]);
   const[searchMode,setSearchMode]=useState("none");
+  const[showEmailModal,setShowEmailModal]=useState(false);
+  const[emailInput,setEmailInput]=useState("");
+  const[emailChecking,setEmailChecking]=useState(false);
+  const[emailError,setEmailError]=useState("");
+  const savedHydrated=useRef(false);
   const searchRef=useRef();
 
-  // Load saved jobs client-side only (avoid SSR hydration mismatch)
+  // Load saved jobs + check paid status client-side only
   useEffect(()=>{
-    try{const s=localStorage.getItem("vr_saved_jobs");if(s)setSaved(JSON.parse(s));}catch{}
+    try{
+      const s=localStorage.getItem("vr_saved_jobs");
+      if(s)setSaved(JSON.parse(s));
+    }catch{}
+    savedHydrated.current=true;
+    try{
+      const storedEmail=localStorage.getItem("vr_paid_email");
+      if(storedEmail)setPaid(true);
+    }catch{}
   },[]);
-  // Save when saved changes
+
+  // Save favoris — seulement apres hydratation
   useEffect(()=>{
+    if(!savedHydrated.current)return;
     try{localStorage.setItem("vr_saved_jobs",JSON.stringify(saved));}catch{}
   },[saved]);
 
   const toggleSave=useCallback((jobName,e)=>{
     e.stopPropagation();
-    setSaved(prev=>{
-      const next=prev.includes(jobName)?prev.filter(n=>n!==jobName):[...prev,jobName];
-      try{localStorage.setItem("vr_saved_jobs",JSON.stringify(next));}catch{}
-      return next;
-    });
+    setSaved(prev=>prev.includes(jobName)?prev.filter(n=>n!==jobName):[...prev,jobName]);
+  },[]);
+
+  // Verifier l email contre Supabase via notre API
+  const checkEmail=useCallback(async(email)=>{
+    setEmailChecking(true);
+    setEmailError("");
+    try{
+      const res=await fetch("/api/check-access",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({email:email.toLowerCase().trim()})
+      });
+      const data=await res.json();
+      if(data.paid){
+        localStorage.setItem("vr_paid_email",email.toLowerCase().trim());
+        setPaid(true);
+        setShowEmailModal(false);
+      } else {
+        setShowEmailModal(false);
+        setShowPayment(true);
+      }
+    }catch{
+      setEmailError("Connection error. Please try again.");
+    }finally{
+      setEmailChecking(false);
+    }
   },[]);
 
   useEffect(()=>{
@@ -492,8 +567,11 @@ export default function JobFinder({onSwitchTab}){
       {selectedJob&&!showPayment&&(
         <EmployerModal job={selectedJob} onClose={()=>setSelectedJob(null)} paid={paid} onUnlock={()=>{setSelectedJob(null);setShowPayment(true);}}/>
       )}
+      {showEmailModal&&(
+        <EmailModal onClose={()=>setShowEmailModal(false)} onCheck={checkEmail} checking={emailChecking} error={emailError}/>
+      )}
       {showPayment&&(
-        <PaymentModal onClose={()=>setShowPayment(false)} onFakePay={()=>{setPaid(true);setShowPayment(false);}}/>
+        <PaymentModal onClose={()=>setShowPayment(false)} onAlreadyPaid={()=>{setShowPayment(false);setShowEmailModal(true);}}/>
       )}
 
       {/* Hero */}
@@ -504,7 +582,7 @@ export default function JobFinder({onSwitchTab}){
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontStyle:"italic",color:"rgba(255,255,255,0.7)"}}>Stay a second year.</div>
           </div>
           {!paid?(
-            <button onClick={()=>setShowPayment(true)} className="jf-cta" style={{background:"rgba(255,255,255,0.15)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:10,padding:"8px 14px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.2s",backdropFilter:"blur(4px)",flexShrink:0}}>
+            <button onClick={()=>setShowEmailModal(true)} className="jf-cta" style={{background:"rgba(255,255,255,0.15)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:10,padding:"8px 14px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.2s",backdropFilter:"blur(4px)",flexShrink:0}}>
               🔓 Unlock {PRICE}
             </button>
           ):(
