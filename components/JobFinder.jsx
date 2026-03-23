@@ -570,13 +570,18 @@ export default function JobFinder({onSwitchTab}){
           <div style={{fontSize:9,color:C.textFaint,letterSpacing:"0.14em",textTransform:"uppercase",fontWeight:600,marginBottom:7}}>Sector</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
             {SECTORS.map(s=>{
-              const active=sector===s||(s==="All"&&!sector);
+              const active=sector===s||(s==="All"&&!sector&&!showSavedOnly);
               return(
-                <button key={s} className="jf-chip" onClick={()=>setSector(s==="All"?null:sector===s?null:s)} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${active?C.green:C.border}`,background:active?C.green:C.bgCard,color:active?"#fff":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                <button key={s} className="jf-chip" onClick={()=>{setShowSavedOnly(false);setSector(s==="All"?null:sector===s?null:s);}} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${active?C.green:C.border}`,background:active?C.green:C.bgCard,color:active?"#fff":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
                   {SECTOR_ICONS[s]} {s}
                 </button>
               );
             })}
+            {saved.length>0&&(
+              <button className="jf-chip" onClick={()=>{setSector(null);setShowSavedOnly(p=>!p);}} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${showSavedOnly?"#f59e0b":C.border}`,background:showSavedOnly?"#fef9ec":C.bgCard,color:showSavedOnly?"#b45309":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                ⭐ Saved <span style={{background:showSavedOnly?"#f59e0b":"#e2e8f0",color:showSavedOnly?"#fff":"#64748b",borderRadius:20,padding:"1px 7px",fontSize:11,fontWeight:700}}>{saved.length}</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -598,16 +603,6 @@ export default function JobFinder({onSwitchTab}){
             {" "}employer{sorted.length!==1?"s":""} found
           </span>
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6}}>
-            {showSavedOnly&&(
-              <button onClick={()=>setShowSavedOnly(false)} style={{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:7,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
-                ← All
-              </button>
-            )}
-            {saved.length>0&&(
-              <button onClick={()=>setShowSavedOnly(p=>!p)} style={{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:7,border:`1.5px solid ${showSavedOnly?"#f59e0b":C.border}`,background:showSavedOnly?"#fef9ec":"transparent",color:showSavedOnly?"#b45309":C.textFaint,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s"}}>
-                ⭐ {saved.length}
-              </button>
-            )}
             {!paid&&sorted.length>FREE_LIMIT&&!showSavedOnly&&(
               <span style={{fontSize:10,color:C.textFaint}}>{FREE_LIMIT} free · {lockedCount} locked</span>
             )}
@@ -657,7 +652,7 @@ export default function JobFinder({onSwitchTab}){
                       </div>
                       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4,flexShrink:0}}>
                         <div style={{display:"flex",alignItems:"center",gap:6}}>
-                          <button onClick={(e)=>toggleSave(job.name,e)} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,padding:2,lineHeight:1,color:saved.includes(job.name)?"#f59e0b":C.textFaint,transition:"all 0.15s"}} title={saved.includes(job.name)?"Remove from saved":"Save"}>
+                          <button onClick={(e)=>toggleSave(job.name,e)} style={{background:saved.includes(job.name)?"#fef9ec":"transparent",border:`1.5px solid ${saved.includes(job.name)?"#f59e0b":C.border}`,borderRadius:8,cursor:"pointer",fontSize:20,padding:"4px 8px",lineHeight:1,color:saved.includes(job.name)?"#f59e0b":C.textFaint,transition:"all 0.2s"}} title={saved.includes(job.name)?"Remove from saved":"Save"}>
                             {saved.includes(job.name)?"⭐":"☆"}
                           </button>
                           <span style={{background:sc+"22",border:`1px solid ${sc}55`,borderRadius:7,padding:"3px 8px",fontSize:11,fontWeight:700,color:sc}}>{job.state}</span>
