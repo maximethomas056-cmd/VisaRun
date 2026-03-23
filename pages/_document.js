@@ -12,6 +12,7 @@ export default function Document() {
         <meta property="og:image" content="https://www.visarun.pro/og-image.png" />
         <meta property="og:url" content="https://www.visarun.pro" />
         <meta property="og:type" content="website" />
+        <meta property="fb:app_id" content="966242223397198" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content="https://www.visarun.pro/og-image.png" />
       </Head>
