@@ -221,11 +221,11 @@ function CopyBtn({text}){
 }
 
 function PaymentModal({onClose, onFakePay}){
+  const STRIPE_URL = "https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00";
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:300,background:"rgba(26,26,24,0.7)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"jfFadeIn 0.2s ease"}}>
       <div onClick={e=>e.stopPropagation()} style={{background:C.bgCard,borderRadius:24,width:"100%",maxWidth:400,boxShadow:C.shadowLg,overflow:"hidden",animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
-        {/* Header with proper logo */}
-        <div style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",padding:"28px 24px 24px",textAlign:"center",position:"relative"}}>
+        <div style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",padding:"28px 24px 24px",textAlign:"center"}}>
           <div style={{width:64,height:64,background:"rgba(255,255,255,0.15)",borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",fontSize:36,margin:"0 auto 12px",border:"2px solid rgba(255,255,255,0.2)"}}>🦘</div>
           <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#fff",marginBottom:4}}>Unlock all contacts</div>
           <div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>One-time payment · Lifetime access</div>
@@ -239,22 +239,20 @@ function PaymentModal({onClose, onFakePay}){
               </div>
             ))}
           </div>
-          <div style={{textAlign:"center",marginBottom:16}}>
+          <div style={{textAlign:"center",marginBottom:20}}>
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:40,fontWeight:700,color:C.green,lineHeight:1}}>{PRICE}</div>
             <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginTop:4}}>{JOB_DATA.length.toLocaleString()} employers · Lifetime access</div>
           </div>
-          <div style={{background:C.bgMuted,borderRadius:14,padding:"16px",textAlign:"center",marginBottom:12}}>
-            <div style={{fontSize:20,marginBottom:6}}>🔧</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,color:C.text,marginBottom:4}}>Payment coming soon</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,lineHeight:1.5}}>We're setting up secure payment.<br/>Leave your email to be notified.</div>
+          <a href={STRIPE_URL} target="_blank" rel="noopener noreferrer" style={{display:"block",width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textAlign:"center",textDecoration:"none",boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
+            🔓 Unlock now — {PRICE}
+          </a>
+          <div style={{display:"flex",justifyContent:"center",gap:16,marginBottom:14}}>
+            {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
+              <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
+            ))}
           </div>
-          <input type="email" placeholder="your@email.com" style={{width:"100%",padding:"12px 14px",borderRadius:10,border:`1.5px solid ${C.border}`,background:C.bgCard,fontSize:13,fontFamily:"'DM Sans',sans-serif",color:C.text,marginBottom:10,boxSizing:"border-box"}}/>
-          <button style={{width:"100%",padding:"14px",borderRadius:12,border:"none",background:C.green,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)"}}>
-            Notify me when available
-          </button>
-          {/* Dev only fake pay button */}
-          <button onClick={onFakePay} style={{width:"100%",padding:"10px",borderRadius:10,border:`1.5px dashed ${C.green}`,background:"transparent",color:C.green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8}}>
-            🧪 [Dev] Simulate payment
+          <button onClick={onFakePay} style={{width:"100%",padding:"10px",borderRadius:10,border:`1.5px dashed ${C.border}`,background:"transparent",color:C.textFaint,fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8}}>
+            Already paid? Click here to unlock
           </button>
           <button onClick={onClose} style={{width:"100%",padding:"10px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
             Close
