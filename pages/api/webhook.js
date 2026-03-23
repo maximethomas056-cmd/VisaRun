@@ -51,14 +51,23 @@ export default async function handler(req, res) {
         process.env.SUPABASE_SERVICE_KEY
       );
 
-      // On enregistre l'email dans la table "customers"
-      const { error } = await supabase
+      // Vérifie si l'email existe déjà
+      const { data: existing } = await supabase
         .from("customers")
-        .upsert({ email }, { onConflict: "email" });
+        .select("email")
+        .eq("email", email)
+        .single();
 
-      if (error) {
-        console.error("Supabase error:", error);
-        return res.status(500).json({ error: "Database error" });
+      // Si l'email n'existe pas encore, on l'insère
+      if (!existing) {
+        const { error } = await supabase
+          .from("customers")
+          .insert({ email });
+
+        if (error) {
+          console.error("Supabase error:", error);
+          return res.status(500).json({ error: "Database error" });
+        }
       }
 
       console.log("✅ Customer saved:", email);
