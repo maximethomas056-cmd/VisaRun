@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Head from "next/head";
 import VisaRun from "../components/VisaRun";
 import JobFinder from "../components/JobFinder";
 
@@ -21,6 +22,25 @@ export default function App() {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
+      <Head>
+        <title>VisaRun — Track Your Regional Work & Stay Longer in Australia</title>
+        <meta name="description" content="Free payslip tracker for Working Holiday backpackers. Count your days of regional work, find direct employer contacts across Australia. No middleman." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+
+        {/* Open Graph — WhatsApp, Facebook, LinkedIn */}
+        <meta property="og:title" content="VisaRun — Track Your Regional Work & Stay Longer in Australia" />
+        <meta property="og:description" content="Free payslip tracker for Working Holiday backpackers. Count your regional work days, find direct employer contacts. No middleman." />
+        <meta property="og:url" content="https://www.visarun.pro" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://www.visarun.pro/og-image.png" />
+
+        {/* Twitter/X */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="VisaRun — Track Your Regional Work & Stay Longer in Australia" />
+        <meta name="twitter:description" content="Free payslip tracker for Working Holiday backpackers. Count your regional work days, find direct employer contacts. No middleman." />
+        <meta name="twitter:image" content="https://www.visarun.pro/og-image.png" />
+      </Head>
 
       {/* ── Sticky top tabs ── */}
       <div style={{
