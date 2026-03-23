@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
       // Vérifie si l'email existe déjà
       const { data: existing } = await supabase
-        .from("customers")
+        .from("Customers")
         .select("email")
         .eq("email", email)
         .single();
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
       // Si l'email n'existe pas encore, on l'insère
       if (!existing) {
         const { error } = await supabase
-          .from("customers")
+          .from("Customers")
           .insert({ email });
 
         if (error) {
