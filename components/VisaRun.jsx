@@ -85,8 +85,29 @@ async function extractText(file) {
   } catch(e) { return ""; }
 }
 
-function calcVisaDays(hours,pDays){ if(!hours||!pDays||isNaN(hours)||isNaN(pDays))return 0; const r=Math.min((hours/(pDays*5))*pDays,pDays); return isNaN(r)||!isFinite(r)?0:r; }
-function dateDiff(from,to){ if(!from||!to)return 0; const p=d=>{const[dd,mm,yy]=d.split("/");return new Date(yy+"-"+mm.padStart(2,"0")+"-"+dd.padStart(2,"0"));}; return Math.round(Math.abs(p(to)-p(from))/86400000)+1; }
+// Visa day rule: hours worked / (period days * 5 days/week) * period = eligible days, capped at period
+// Full days only count (floor per entry, not on cumulative total)
+function calcVisaDays(hours,pDays){
+  if(!hours||!pDays||isNaN(hours)||isNaN(pDays)||hours<=0||pDays<=0)return 0;
+  const r=Math.min((hours/(pDays*5))*pDays,pDays);
+  return isNaN(r)||!isFinite(r)?0:r;
+}
+function dateDiff(from,to){
+  if(!from||!to)return 0;
+  const parseDate=d=>{
+    const parts=d.split("/");
+    if(parts.length!==3)return null;
+    const[dd,mm,yy]=parts;
+    if(!dd||!mm||!yy)return null;
+    const dt=new Date(`${yy}-${mm.padStart(2,"0")}-${dd.padStart(2,"0")}`);
+    return isNaN(dt.getTime())?null:dt;
+  };
+  const d1=parseDate(from),d2=parseDate(to);
+  if(!d1||!d2)return 0;
+  const diff=d2-d1;
+  if(diff<0)return 0; // reversed dates → 0
+  return Math.round(diff/86400000)+1;
+}
 function validateABN(abn){ const d=String(abn).replace(/\s/g,""); if(!/^\d{11}$/.test(d))return false; const w=[10,1,3,5,7,9,11,13,15,17,19]; return w.reduce((s,wt,i)=>s+wt*(i===0?Number(d[i])-1:Number(d[i])),0)%89===0; }
 
 async function processDocumentAI(rawText) {
@@ -548,6 +569,7 @@ export default function VisaRunApp({onSwitchTab}){
   const[goal,setGoal]=useState(88);
   const[rooJump,setRooJump]=useState(false);
   const[confetti,setConfetti]=useState(null);
+  const hydrated=useRef(false); // prevent saving before storage is loaded
   const streak=useMemo(()=>{
     if(!entries.length) return 0;
     const weeks=new Set(entries.map(e=>{
@@ -570,8 +592,7 @@ export default function VisaRunApp({onSwitchTab}){
   const resolver=useRef(null);
 
   useEffect(()=>{
-    loadEntries().then(e=>setEntries(e));
-    loadGoal().then(g=>setGoal(g));
+    loadEntries().then(e=>{setEntries(e);}).then(()=>loadGoal()).then(g=>{setGoal(g);hydrated.current=true;});
   },[]);
 
   useEffect(()=>{
@@ -583,10 +604,11 @@ export default function VisaRunApp({onSwitchTab}){
     const s=document.createElement("style");s.id="vr-css";s.textContent=CSS;document.head.appendChild(s);
   },[]);
 
-  useEffect(()=>{ saveEntries(entries); },[entries]);
-  useEffect(()=>{ saveGoal(goal); },[goal]);
+  useEffect(()=>{ if(hydrated.current) saveEntries(entries); },[entries]);
+  useEffect(()=>{ if(hydrated.current) saveGoal(goal); },[goal]);
 
-  const totalDays=Math.floor(entries.reduce((s,e)=>s+(e.farmDays??0),0));
+  // Floor per entry (immigration counts full days per payslip, not cumulative fractions)
+  const totalDays=entries.reduce((s,e)=>s+Math.floor(e.farmDays??0),0);
   useEffect(()=>{
     const MILESTONES=[25,50,88,179];
     const prev=prevDays.current;

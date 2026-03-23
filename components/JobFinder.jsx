@@ -364,9 +364,18 @@ export default function JobFinder({onSwitchTab}){
   const[cityName,setCityName]=useState("");
   const[suggestions,setSuggestions]=useState([]);
   const[showSavedOnly,setShowSavedOnly]=useState(false);
-  const[saved,setSaved]=useState(()=>{try{return JSON.parse(localStorage.getItem("vr_saved_jobs")||"[]");}catch{return[];}});
+  const[saved,setSaved]=useState([]); // start empty, load client-side
   const[searchMode,setSearchMode]=useState("none");
   const searchRef=useRef();
+
+  // Load saved jobs client-side only (avoid SSR hydration mismatch)
+  useEffect(()=>{
+    try{const s=localStorage.getItem("vr_saved_jobs");if(s)setSaved(JSON.parse(s));}catch{}
+  },[]);
+  // Save when saved changes
+  useEffect(()=>{
+    try{localStorage.setItem("vr_saved_jobs",JSON.stringify(saved));}catch{}
+  },[saved]);
 
   const toggleSave=useCallback((jobName,e)=>{
     e.stopPropagation();
@@ -589,15 +598,20 @@ export default function JobFinder({onSwitchTab}){
             {" "}employer{sorted.length!==1?"s":""} found
           </span>
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6}}>
+            {showSavedOnly&&(
+              <button onClick={()=>setShowSavedOnly(false)} style={{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:7,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
+                ← All
+              </button>
+            )}
             {saved.length>0&&(
-              <button onClick={()=>setShowSavedOnly(p=>!p)} style={{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:7,border:`1.5px solid ${showSavedOnly?"#f59e0b":C.border}`,background:showSavedOnly?"#fef9ec":"transparent",color:showSavedOnly?"#b45309":C.textFaint,fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s"}}>
+              <button onClick={()=>setShowSavedOnly(p=>!p)} style={{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:7,border:`1.5px solid ${showSavedOnly?"#f59e0b":C.border}`,background:showSavedOnly?"#fef9ec":"transparent",color:showSavedOnly?"#b45309":C.textFaint,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s"}}>
                 ⭐ {saved.length}
               </button>
             )}
-            {!paid&&sorted.length>FREE_LIMIT&&(
+            {!paid&&sorted.length>FREE_LIMIT&&!showSavedOnly&&(
               <span style={{fontSize:10,color:C.textFaint}}>{FREE_LIMIT} free · {lockedCount} locked</span>
             )}
-            {paid&&cityCoords&&<span style={{fontSize:10,color:C.green,fontWeight:600}}>📍 By proximity</span>}
+            {paid&&cityCoords&&!showSavedOnly&&<span style={{fontSize:10,color:C.green,fontWeight:600}}>📍 By proximity</span>}
           </div>
         </div>
 
