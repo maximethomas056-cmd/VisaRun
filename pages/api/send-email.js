@@ -104,6 +104,11 @@ export default async function handler(req, res) {
       <h2 style="color:#1a1a18;font-size:13px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.1em;">❓ Need help?</h2>
       <p style="color:#5a5850;font-size:14px;margin:0 0 14px;">Find us on social media — we respond fast 👋</p>
       <p style="margin:0 0 8px;font-size:14px;">
+        <a href="mailto:visarunpro@gmail.com" style="display:inline-block;background:#f5f3ee;border:1px solid #e8e3d9;border-radius:8px;padding:8px 16px;color:#1a1a18;text-decoration:none;font-weight:600;font-size:13px;">
+          📧 visarunpro@gmail.com
+        </a>
+      </p>
+      <p style="margin:6px 0 8px;font-size:14px;">
         <a href="https://instagram.com/visarun" style="display:inline-block;background:#f5f3ee;border:1px solid #e8e3d9;border-radius:8px;padding:8px 16px;color:#1a1a18;text-decoration:none;font-weight:600;font-size:13px;">
           📸 Instagram @visarun
         </a>
