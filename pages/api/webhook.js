@@ -71,6 +71,18 @@ export default async function handler(req, res) {
       }
 
       console.log("✅ Customer saved:", email);
+
+      // Envoyer l'email de confirmation via Resend
+      try {
+        await fetch("https://www.visarun.pro/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        console.log("✅ Confirmation email sent to:", email);
+      } catch (emailErr) {
+        console.error("Email send error:", emailErr);
+      }
     }
   }
 
