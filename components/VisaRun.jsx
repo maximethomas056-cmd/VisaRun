@@ -691,48 +691,47 @@ export default function VisaRunApp({onSwitchTab}){
         </div>
       </div>
 
-      <FiscalBanner/>
-      <HeroProgress totalDays={totalDays} goal={goal} onGoalChange={setGoal} rooJump={rooJump}/>
+      {sorted.length>0&&<FiscalBanner/>}
+      {sorted.length>0&&<HeroProgress totalDays={totalDays} goal={goal} onGoalChange={setGoal} rooJump={rooJump}/>}
 
       <div style={{maxWidth:600,margin:"0 auto",padding:"0 20px 40px"}}>
         <input ref={fileRef} type="file" accept=".pdf,image/*" multiple style={{display:"none"}} onChange={e=>processFiles(Array.from(e.target.files))}/>
         {sorted.length===0&&(
-          <div style={{paddingTop:8}}>
+          <div style={{paddingTop:16}}>
+            {/* Hero scan — plein écran, action principale */}
             <div
               className="drop-zone"
               onClick={()=>fileRef.current?.click()}
-              style={{background:dragging?C.greenBg:C.bgCard,border:`2px dashed ${dragging?C.green:C.greenBorder}`,borderRadius:16,padding:"20px",marginBottom:12,boxShadow:C.shadow,cursor:"pointer"}}
+              style={{background:dragging?C.greenBg:C.bgCard,border:`2px dashed ${dragging?C.green:C.greenBorder}`,borderRadius:20,padding:"32px 24px",marginBottom:12,boxShadow:C.shadow,cursor:"pointer",textAlign:"center"}}
             >
-              {/* Titre */}
-              <div style={{textAlign:"center",marginBottom:16}}>
-                <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:C.text,marginBottom:4,lineHeight:1.3}}>
-                  {dragging?"Drop it! 🎯 ":"Scan your payslip."}
-                </div>
-                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint}}>
-                  AI reads it in seconds · Your days are counted automatically.
-                </div>
+              <div style={{fontSize:52,lineHeight:1,marginBottom:14}}>🦘</div>
+              <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:C.text,marginBottom:6,lineHeight:1.3}}>
+                {dragging?"Drop it! 🎯":"Scan your payslip."}
               </div>
-              {/* Bouton CTA principal */}
+              <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:C.textFaint,marginBottom:20,lineHeight:1.6}}>
+                AI reads it in seconds.<br/>Your regional work days are counted automatically.
+              </div>
               <button
                 onClick={e=>{e.stopPropagation();fileRef.current?.click();}}
-                style={{width:"100%",padding:"15px",borderRadius:12,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:9,marginBottom:12,boxSizing:"border-box",boxShadow:"0 4px 16px rgba(26,122,74,0.25)"}}
+                style={{width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:14,boxSizing:"border-box",boxShadow:"0 4px 20px rgba(26,122,74,0.3)"}}
               >
-                <span style={{fontSize:18}}>📄</span> Scan my payslip
+                <span style={{fontSize:20}}>📄</span> Scan my payslip — it's free
               </button>
-              {/* Format + vitesse */}
-              <div style={{display:"flex",justifyContent:"center",gap:16,marginBottom:14}}>
-                {[["📄","PDF"],["📸","Photo"],["⚡","5 sec"]].map(([icon,label])=>(
-                  <div key={label} style={{display:"flex",alignItems:"center",gap:4,fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.textFaint,fontWeight:600}}>
-                    <span style={{fontSize:12}}>{icon}</span>{label}
+              <div style={{display:"flex",justifyContent:"center",gap:20,marginBottom:16}}>
+                {[["📄","PDF"],["📸","Photo"],["⚡","Instant"]].map(([icon,label])=>(
+                  <div key={label} style={{display:"flex",alignItems:"center",gap:4,fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,fontWeight:600}}>
+                    <span style={{fontSize:13}}>{icon}</span>{label}
                   </div>
                 ))}
               </div>
-              {/* Works with */}
-              <div style={{borderTop:`1px solid ${C.border}`,paddingTop:12,display:"flex",flexWrap:"wrap",justifyContent:"center",gap:5}}>
-                {["Xero","MYOB","Employment Hero","KeyPay","Payroller","QuickBooks"].map(name=>(
-                  <span key={name} style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,fontWeight:600,color:C.textMid,background:C.bgMuted,border:`1px solid ${C.border}`,borderRadius:6,padding:"3px 8px"}}>{name}</span>
-                ))}
-                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.textFaint,border:`1px dashed ${C.border}`,borderRadius:6,padding:"3px 8px",fontStyle:"italic"}}>& more</span>
+              <div style={{borderTop:`1px solid ${C.border}`,paddingTop:14}}>
+                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.textFaint,letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,marginBottom:8}}>Works with</div>
+                <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:5}}>
+                  {["Xero","MYOB","Employment Hero","KeyPay","Payroller","QuickBooks"].map(name=>(
+                    <span key={name} style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,fontWeight:600,color:C.textMid,background:C.bgMuted,border:`1px solid ${C.border}`,borderRadius:6,padding:"3px 8px"}}>{name}</span>
+                  ))}
+                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.textFaint,border:`1px dashed ${C.border}`,borderRadius:6,padding:"3px 8px",fontStyle:"italic"}}>& more</span>
+                </div>
               </div>
             </div>
             <StatCards totals={totals}/>
