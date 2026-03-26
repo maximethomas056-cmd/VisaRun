@@ -14,6 +14,178 @@ const C = {
   bgCard: "#ffffff",
 };
 
+
+const FAQ_ITEMS = [
+  {
+    category: "Free & Paid",
+    icon: "🆓",
+    questions: [
+      {
+        q: "Is VisaRun really free?",
+        a: "Yes — the payslip tracker, day counter, and visa progress are 100% free, forever. No credit card required. You only pay if you want access to the full employer contact database."
+      },
+      {
+        q: "What do I get with the $24.90 payment?",
+        a: "You unlock 2,000+ direct employer contacts across Australia — phone numbers, recruitment emails, and official websites. One-time payment, lifetime access. No subscription, no hidden fees."
+      },
+      {
+        q: "Is it a subscription or one-time?",
+        a: "One-time only. Pay once, keep access forever. We'll never charge you again."
+      }
+    ]
+  },
+  {
+    category: "Payslip scanner",
+    icon: "📄",
+    questions: [
+      {
+        q: "Which payslip formats work?",
+        a: "PDF and photos (screenshot or camera). Works with Xero, MYOB, Employment Hero, KeyPay, Payroller, QuickBooks and most Australian payroll systems."
+      },
+      {
+        q: "Is my data safe? Where is it stored?",
+        a: "Your payslip data never leaves your device — it's stored locally in your browser. We don't store your payslips on our servers. Only your email (if you've paid) is stored securely in our database."
+      },
+      {
+        q: "The AI extracted wrong data — what do I do?",
+        a: "You can edit every field before saving — always review the extracted details. Never save without checking. If something looks off, correct it manually."
+      }
+    ]
+  },
+  {
+    category: "Day calculation",
+    icon: "📅",
+    questions: [
+      {
+        q: "How are eligible days calculated?",
+        a: "We estimate based on your hours worked and pay period length. The formula follows Australian immigration guidelines for regional work. Always verify your final count with an official migration agent or homeaffairs.gov.au."
+      },
+      {
+        q: "Does VisaRun guarantee my visa eligibility?",
+        a: "No — VisaRun provides estimates to help you track your progress. It is not an official immigration tool. Always verify with the Australian Department of Home Affairs before applying for your second or third year visa."
+      }
+    ]
+  },
+  {
+    category: "Job Finder",
+    icon: "🔍",
+    questions: [
+      {
+        q: "Are these employers currently hiring?",
+        a: "We can't guarantee current availability — farm and regional hiring changes constantly. The database gives you direct contacts so you can call or email them yourself and get a real answer fast."
+      },
+      {
+        q: "How do I contact employers?",
+        a: "Unlock the full database, then call directly — don't just email. Farm managers respond much faster to phone calls. A 2-minute call beats 10 unanswered emails every time."
+      }
+    ]
+  }
+];
+
+function FAQ() {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggle = (key) => setOpenIndex(openIndex === key ? null : key);
+
+  return (
+    <div style={{ maxWidth: 600, margin: "0 auto", padding: "0 20px 48px", fontFamily: "'DM Sans', sans-serif" }}>
+      <div style={{ textAlign: "center", marginBottom: 24, paddingTop: 8 }}>
+        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: "#1a1a18", marginBottom: 6 }}>
+          Frequently asked questions
+        </div>
+        <div style={{ fontSize: 13, color: "#9a9488" }}>
+          Everything you need to know about VisaRun
+        </div>
+      </div>
+
+      {FAQ_ITEMS.map((cat) => (
+        <div key={cat.category} style={{ marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <span style={{ fontSize: 14 }}>{cat.icon}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#9a9488" }}>
+              {cat.category}
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {cat.questions.map((item, i) => {
+              const key = cat.category + i;
+              const isOpen = openIndex === key;
+              return (
+                <div
+                  key={key}
+                  style={{
+                    background: "#ffffff",
+                    border: `1px solid ${isOpen ? "#b8e0c8" : "#e8e3d9"}`,
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    transition: "border-color 0.2s",
+                  }}
+                >
+                  <button
+                    onClick={() => toggle(key)}
+                    style={{
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      textAlign: "left",
+                    }}
+                  >
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "#1a1a18", lineHeight: 1.4 }}>
+                      {item.q}
+                    </span>
+                    <span style={{
+                      fontSize: 18,
+                      color: isOpen ? "#1a7a4a" : "#9a9488",
+                      transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                      transition: "transform 0.2s, color 0.2s",
+                      flexShrink: 0,
+                      lineHeight: 1,
+                    }}>+</span>
+                  </button>
+                  {isOpen && (
+                    <div style={{
+                      padding: "0 16px 16px",
+                      fontSize: 13,
+                      color: "#5a5850",
+                      lineHeight: 1.7,
+                      borderTop: "1px solid #edf7f1",
+                      paddingTop: 12,
+                    }}>
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      <div style={{
+        background: "#edf7f1",
+        border: "1px solid #b8e0c8",
+        borderRadius: 12,
+        padding: "14px 18px",
+        textAlign: "center",
+        marginTop: 8,
+      }}>
+        <span style={{ fontSize: 13, color: "#1a7a4a" }}>
+          Still have questions? Email us at{" "}
+          <a href="mailto:visarunpro@gmail.com" style={{ color: "#1a7a4a", fontWeight: 700, textDecoration: "none" }}>
+            visarunpro@gmail.com
+          </a>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState("visa");
   const [welcomeBanner, setWelcomeBanner] = useState(false);
@@ -151,6 +323,9 @@ export default function App() {
         {activeTab === "visa" && <VisaRun onSwitchTab={setActiveTab}/>}
         {activeTab === "jobs" && <JobFinder onSwitchTab={setActiveTab}/>}
       </div>
+
+      {/* ── FAQ ── */}
+      <FAQ />
 
       {/* ── Footer ── */}
       <div style={{
