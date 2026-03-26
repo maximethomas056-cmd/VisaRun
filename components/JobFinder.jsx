@@ -316,10 +316,16 @@ function EmployerModal({job, onClose, paid, onUnlock}){
     return()=>document.removeEventListener("keydown",fn);
   },[]);
   const sc=STATE_COLORS[job.state]||"#888";
+  const igHandle=job.instagram?job.instagram.replace(/https?:\/\/(www\.)?instagram\.com\//,"@").replace(/\/$/,""):"";
+  const fbIsNumeric=job.facebook&&/\/\d+\/?$/.test(job.facebook);
+  const fbLabel=fbIsNumeric?`${job.name} · Facebook`:job.facebook?job.facebook.replace(/https?:\/\/(www\.)?facebook\.com\//,"").replace(/\/$/,""):"";
+  const INSTA_SVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#9d174d" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#9d174d" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="#9d174d"/></svg>`;
+  const FB_SVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="#1d4ed8" xmlns="http://www.w3.org/2000/svg"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>`;
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:200,background:"rgba(26,26,24,0.6)",backdropFilter:"blur(8px)",display:"flex",alignItems:"flex-end",justifyContent:"center",animation:"jfFadeIn 0.2s ease"}}>
-      <div onClick={e=>e.stopPropagation()} style={{background:C.bgCard,borderRadius:"20px 20px 0 0",width:"100%",maxWidth:560,maxHeight:"82vh",overflowY:"auto",boxShadow:C.shadowLg,animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
-        <div style={{borderBottom:`1px solid ${C.border}`,padding:"20px 20px 16px",position:"sticky",top:0,background:C.bgCard,zIndex:10}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:C.bgCard,borderRadius:"20px 20px 0 0",width:"100%",maxWidth:560,maxHeight:"82vh",display:"flex",flexDirection:"column",boxShadow:C.shadowLg,animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
+        {/* Header sticky */}
+        <div style={{borderBottom:`1px solid ${C.border}`,padding:"20px 20px 16px",flexShrink:0,background:C.bgCard,borderRadius:"20px 20px 0 0"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
             <div style={{width:48,height:48,borderRadius:12,background:C.bgMuted,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0,border:`1px solid ${C.border}`}}>
               {SECTOR_ICONS[job.sector]||"🏢"}
@@ -338,7 +344,8 @@ function EmployerModal({job, onClose, paid, onUnlock}){
             <button onClick={onClose} style={{background:"transparent",border:"none",fontSize:22,cursor:"pointer",color:C.textFaint,padding:4,flexShrink:0,lineHeight:1}}>✕</button>
           </div>
         </div>
-        <div style={{padding:"16px 20px 32px"}}>
+        {/* Contenu scrollable */}
+        <div style={{overflowY:"auto",flex:1,padding:"16px 20px 8px"}}>
           {job.score>0&&(
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,background:C.bgMuted,borderRadius:10,padding:"10px 14px"}}>
               <div style={{display:"flex",gap:2}}>
@@ -367,7 +374,7 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               <span style={{fontSize:12,color:C.green,flexShrink:0}}>→</span>
             </a>
           )}
-          <div style={{borderRadius:14,overflow:"hidden",marginBottom:12,border:`1.5px solid ${paid?C.greenBorder:"#e8e3d9"}`}}>
+          <div style={{borderRadius:14,overflow:"hidden",marginBottom:8,border:`1.5px solid ${paid?C.greenBorder:"#e8e3d9"}`}}>
             <div style={{background:paid?"#edf7f1":"#1a7a4a",padding:"10px 14px",display:"flex",alignItems:"center",gap:8}}>
               <span style={{fontSize:14}}>{paid?"✓":"🔒"}</span>
               <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:700,color:paid?C.green:"#fff",letterSpacing:"0.08em",textTransform:"uppercase"}}>
@@ -383,7 +390,7 @@ function EmployerModal({job, onClose, paid, onUnlock}){
                   <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:700,color:"#1a1a18",flex:1,filter:"blur(4px)",userSelect:"none"}}>{job.phone||"+61 7 4153 xxxx"}</div>
                 )}
               </div>
-              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:paid&&(job.instagram||job.facebook)?10:0}}>
                 <span style={{fontSize:16,flexShrink:0}}>✉️</span>
                 {paid?(
                   <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}}>{job.email||"—"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
@@ -393,43 +400,47 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               </div>
               {paid&&job.instagram&&(
                 <a href={job.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#fdf2f8",border:"1px solid #f9a8d4",borderRadius:8,padding:"8px 10px",textDecoration:"none",marginBottom:8}}>
-                  <span style={{fontSize:14}}>📸</span>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"#9d174d",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.instagram.replace(/https?:\/\/(www\.)?instagram\.com\//,"@")}</span>
+                  <span dangerouslySetInnerHTML={{__html:INSTA_SVG}} style={{flexShrink:0,display:"flex"}}/>
+                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#9d174d",fontWeight:700,flex:1}}>{igHandle}</span>
                   <span style={{fontSize:11,color:"#9d174d"}}>→</span>
                 </a>
               )}
               {paid&&job.facebook&&(
                 <a href={job.facebook} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#eff6ff",border:"1px solid #93c5fd",borderRadius:8,padding:"8px 10px",textDecoration:"none"}}>
-                  <span style={{fontSize:14}}>👥</span>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"#1d4ed8",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.facebook.replace(/https?:\/\/(www\.)?facebook\.com\//,"")}</span>
+                  <span dangerouslySetInnerHTML={{__html:FB_SVG}} style={{flexShrink:0,display:"flex"}}/>
+                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1d4ed8",fontWeight:700,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{fbLabel}</span>
                   <span style={{fontSize:11,color:"#1d4ed8"}}>→</span>
                 </a>
               )}
               {!paid&&(
                 <div style={{display:"flex",gap:6,marginTop:4}}>
-                  {[["📸","Instagram"],["👥","Facebook"],["📍","By distance"]].map(([icon,label])=>(
-                    <div key={label} style={{flex:1,background:"#f5f3ee",borderRadius:8,padding:"7px 4px",textAlign:"center"}}>
-                      <div style={{fontSize:15,marginBottom:2}}>{icon}</div>
-                      <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:"#9a9488",fontWeight:600}}>{label}</div>
+                  {[[INSTA_SVG,"#fdf2f8","#9d174d","Instagram"],[FB_SVG,"#eff6ff","#1d4ed8","Facebook"],["📍","#f5f3ee","#9a9488","By distance"]].map(([icon,bg,color,label])=>(
+                    <div key={label} style={{flex:1,background:bg,borderRadius:8,padding:"7px 4px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+                      {label==="By distance"
+                        ?<span style={{fontSize:15}}>📍</span>
+                        :<span dangerouslySetInnerHTML={{__html:icon}} style={{display:"flex"}}/>
+                      }
+                      <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color,fontWeight:700}}>{label}</div>
                     </div>
                   ))}
                 </div>
               )}
             </div>
           </div>
-          {!paid&&(
-            <div style={{marginBottom:12}}>
-              <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{display:"flex",width:"100%",padding:"16px",borderRadius:13,background:"#1a7a4a",color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:8,textDecoration:"none",boxSizing:"border-box"}}>
-                🔓 Unlock all contacts — {PRICE}
-              </a>
-              <div style={{display:"flex",justifyContent:"center",gap:14}}>
-                {["🔐 Secure","⚡ Instant","✅ Lifetime"].map(t=>(
-                  <span key={t} style={{fontSize:10,color:C.textFaint,fontFamily:"'DM Sans',sans-serif"}}>{t}</span>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+        {/* Sticky CTA en bas — seulement non payé */}
+        {!paid&&(
+          <div style={{padding:"12px 20px 24px",flexShrink:0,borderTop:`1px solid ${C.border}`,background:C.bgCard}}>
+            <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{display:"flex",width:"100%",padding:"16px",borderRadius:13,background:"#1a7a4a",color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:8,textDecoration:"none",boxSizing:"border-box"}}>
+              🔓 Unlock all contacts — {PRICE}
+            </a>
+            <div style={{display:"flex",justifyContent:"center",gap:16}}>
+              {["🔐 Secure","⚡ Instant","✅ Lifetime"].map(t=>(
+                <span key={t} style={{fontSize:10,color:C.textFaint,fontFamily:"'DM Sans',sans-serif"}}>{t}</span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
