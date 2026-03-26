@@ -693,6 +693,7 @@ export default function VisaRunApp({onSwitchTab}){
 
       {sorted.length>0&&<FiscalBanner/>}
       {sorted.length>0&&<HeroProgress totalDays={totalDays} goal={goal} onGoalChange={setGoal} rooJump={rooJump}/>}
+      {sorted.length>0&&<StatCards totals={totals}/>}
 
       <div style={{maxWidth:600,margin:"0 auto",padding:"0 20px 40px"}}>
         <input ref={fileRef} type="file" accept=".pdf,image/*" multiple style={{display:"none"}} onChange={e=>processFiles(Array.from(e.target.files))}/>
@@ -750,7 +751,6 @@ export default function VisaRunApp({onSwitchTab}){
               <span style={{fontSize:16}}>📄</span>
               <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:C.green,fontWeight:700}}>Add a payslip · <span style={{fontWeight:400,color:C.teal}}>PDF or photo</span></span>
             </div>
-            <StatCards totals={totals}/>
             {onSwitchTab&&<FindWorkBanner onSwitchTab={onSwitchTab}/>}
           </>
         )}
