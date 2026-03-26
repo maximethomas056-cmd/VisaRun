@@ -265,9 +265,9 @@ function PaymentModal({onClose, onAlreadyPaid}){
       <div onClick={e=>e.stopPropagation()} style={{background:C.bgCard,borderRadius:24,width:"100%",maxWidth:400,boxShadow:C.shadowLg,overflow:"hidden",animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
         <div style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",padding:"28px 24px 22px",textAlign:"center"}}>
           <div style={{fontSize:38,marginBottom:10}}>🦘</div>
-          <div style={{fontFamily:"'Playfair Display',serif",fontSize:21,fontWeight:700,color:"#fff",marginBottom:5,lineHeight:1.2}}>Find employers directly.</div>
-          <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#fff",marginBottom:8,lineHeight:1.2}}>No middleman. No agency fees.</div>
-          <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:"rgba(255,255,255,0.75)"}}>2,000+ direct contacts across Australia.</div>
+          <div style={{fontFamily:"'Playfair Display',serif",fontSize:21,fontWeight:700,color:"#fff",marginBottom:5,lineHeight:1.2}}>Skip the agencies.</div>
+          <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#fff",marginBottom:8,lineHeight:1.2}}>Contact employers yourself.</div>
+          <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:"rgba(255,255,255,0.75)"}}>Find work anywhere in Australia — no middleman.</div>
         </div>
         <div style={{padding:"18px 20px 22px"}}>
           <div style={{background:C.greenLight,border:`1px solid ${C.greenBorder}`,borderRadius:8,padding:"9px 13px",marginBottom:14,display:"flex",alignItems:"center",gap:8}}>
@@ -367,48 +367,46 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               <span style={{fontSize:12,color:C.green,flexShrink:0}}>→</span>
             </a>
           )}
-          <div style={{border:`1.5px solid ${paid?C.greenBorder:C.border}`,borderRadius:12,padding:"14px",marginBottom:12,background:paid?C.greenLight+"30":C.bgMuted}}>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:paid?C.green:C.textFaint,letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,marginBottom:12}}>
-              {paid?"✓ Direct contacts":"📞 Direct contact available"}
+          <div style={{borderRadius:14,overflow:"hidden",marginBottom:12,border:`1.5px solid ${paid?C.greenBorder:"#e8e3d9"}`}}>
+            {/* Header du bloc contacts */}
+            <div style={{background:paid?"#edf7f1":"#1a7a4a",padding:"10px 14px",display:"flex",alignItems:"center",gap:8}}>
+              <span style={{fontSize:14}}>{paid?"✓":"🔒"}</span>
+              <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:700,color:paid?C.green:"#fff",letterSpacing:"0.08em",textTransform:"uppercase"}}>
+                {paid?"Direct contacts unlocked":"Unlock direct contacts"}
+              </span>
             </div>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-              <span style={{fontSize:16,flexShrink:0}}>📞</span>
-              {paid?(
-                <><a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}}>{job.phone||"—"}</a>{job.phone&&<CopyBtn text={job.phone}/>}</>
-              ):(
-                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.textMid,flex:1,fontWeight:700,letterSpacing:"0.05em"}}>{job.phone?job.phone.slice(0,6)+"·· ····":"+61 ·· ···· ····"}</span>
-              )}
-            </div>
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <span style={{fontSize:16,flexShrink:0}}>✉️</span>
-              {paid?(
-                <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}}>{job.email||"—"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
-              ):(
-                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1}}>{job.email?job.email.split("@")[0].slice(0,4)+"···@"+job.email.split("@")[1]:"···@employer.com.au"}</span>
-              )}
+            <div style={{background:paid?C.greenLight+"30":"#fff",padding:"14px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                <span style={{fontSize:16,flexShrink:0}}>📞</span>
+                {paid?(
+                  <><a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}}>{job.phone||"—"}</a>{job.phone&&<CopyBtn text={job.phone}/>}</>
+                ):(
+                  <div style={{flex:1}}>
+                    <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:700,color:"#1a1a18",letterSpacing:"0.04em",filter:"blur(4px)",userSelect:"none"}}>{job.phone||"+61 7 4153 xxxx"}</div>
+                  </div>
+                )}
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:paid?0:0}}>
+                <span style={{fontSize:16,flexShrink:0}}>✉️</span>
+                {paid?(
+                  <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}}>{job.email||"—"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
+                ):(
+                  <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1a1a18",flex:1,filter:"blur(4px)",userSelect:"none"}}>{job.email||"hiring@employer.com.au"}</div>
+                )}
+              </div>
             </div>
           </div>
+          {/* CTA unlock — seulement si non payé */}
           {!paid&&(
-            <button onClick={onUnlock} style={{width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:12}}>
-              🔓 Unlock all contacts — {PRICE}
-            </button>
-          )}
-          {paid&&(job.instagram||job.facebook)&&(
-            <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
-              {job.instagram&&(
-                <a href={job.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:"#fdf2f8",border:"1px solid #f9a8d4",borderRadius:10,padding:"11px 14px",textDecoration:"none"}}>
-                  <span style={{fontSize:16}}>📸</span>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#9d174d",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.instagram.replace(/https?:\/\/(www\.)?instagram\.com\//,"@")}</span>
-                  <span style={{fontSize:12,color:"#9d174d",flexShrink:0}}>→</span>
-                </a>
-              )}
-              {job.facebook&&(
-                <a href={job.facebook} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:"#eff6ff",border:"1px solid #93c5fd",borderRadius:10,padding:"11px 14px",textDecoration:"none"}}>
-                  <span style={{fontSize:16}}>👥</span>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1d4ed8",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.facebook.replace(/https?:\/\/(www\.)?facebook\.com\//,"")}</span>
-                  <span style={{fontSize:12,color:"#1d4ed8",flexShrink:0}}>→</span>
-                </a>
-              )}
+            <div style={{marginBottom:12}}>
+              <button onClick={onUnlock} style={{width:"100%",padding:"16px",borderRadius:13,border:"none",background:"#1a7a4a",color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:8,boxSizing:"border-box"}}>
+                🔓 Unlock all contacts — {PRICE}
+              </button>
+              <div style={{display:"flex",justifyContent:"center",gap:14}}>
+                {["🔐 Secure","⚡ Instant","✅ Lifetime"].map(t=>(
+                  <span key={t} style={{fontSize:10,color:C.textFaint,fontFamily:"'DM Sans',sans-serif"}}>{t}</span>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -476,7 +474,6 @@ export default function JobFinder({onSwitchTab}){
         localStorage.setItem("vr_paid_email",email.toLowerCase().trim());
         setPaid(true);
         setShowEmailModal(false);
-        window.scrollTo({top:0,behavior:"smooth"});
       } else {
         setShowEmailModal(false);
         setShowPayment(true);
@@ -766,26 +763,19 @@ export default function JobFinder({onSwitchTab}){
                       </div>
                     </div>
                     {/* Location row */}
-                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:6}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:job.website?6:0}}>
                       <span style={{fontSize:11}}>📍</span>
                       <span style={{fontSize:11,fontWeight:500,color:C.textMid,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.city||job.state}{job.address?` · ${job.address}`:""}</span>
                       <a href={`https://maps.google.com/?q=${encodeURIComponent((job.city||job.state)+", Australia")}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:10,color:C.teal,fontWeight:600,textDecoration:"none",flexShrink:0}}>Map →</a>
                     </div>
-                    {/* Contact badges */}
-                    <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
-                      {[
-                        {label:"Phone",    val:job.phone},
-                        {label:"Email",    val:job.email},
-                        {label:"Website",  val:job.website},
-                        {label:"Instagram",val:job.instagram},
-                        {label:"Facebook", val:job.facebook},
-                      ].map(({label,val})=>(
-                        <span key={label} style={{display:"flex",alignItems:"center",gap:4,padding:"3px 8px",borderRadius:20,fontSize:10,fontWeight:600,background:val?C.greenLight:C.bgMuted,color:val?C.green:C.textFaint,border:`1px solid ${val?C.greenBorder:C.border}`}}>
-                          <span style={{width:5,height:5,borderRadius:"50%",background:val?C.green:C.border,display:"inline-block",flexShrink:0}}/>
-                          {label}
-                        </span>
-                      ))}
-                    </div>
+                    {/* Website row */}
+                    {job.website&&(
+                      <div style={{display:"flex",alignItems:"center",gap:6,background:C.greenLight,borderRadius:8,padding:"6px 10px",border:`1px solid ${C.greenBorder}`}}>
+                        <span style={{fontSize:11}}>🌐</span>
+                        <a href={job.website} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:C.green,fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textDecoration:"none"}}>{job.website.replace(/https?:\/\/(www\.)?/,"")}</a>
+                        <span style={{fontSize:10,color:C.green,flexShrink:0}}>→</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
