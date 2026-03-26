@@ -750,6 +750,7 @@ export default function VisaRunApp({onSwitchTab}){
               <span style={{fontSize:16}}>📄</span>
               <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:C.green,fontWeight:700}}>Add a payslip · <span style={{fontWeight:400,color:C.teal}}>PDF or photo</span></span>
             </div>
+            <StatCards totals={totals}/>
             {onSwitchTab&&<FindWorkBanner onSwitchTab={onSwitchTab}/>}
           </>
         )}
