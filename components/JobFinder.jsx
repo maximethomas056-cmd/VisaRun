@@ -367,16 +367,16 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               <span style={{fontSize:12,color:C.green,flexShrink:0}}>→</span>
             </a>
           )}
-          <div style={{border:`1.5px solid ${paid?C.greenBorder:C.border}`,borderRadius:12,padding:"14px",marginBottom:paid?0:14,background:paid?C.greenLight+"30":C.bgMuted}}>
+          <div style={{border:`1.5px solid ${paid?C.greenBorder:C.border}`,borderRadius:12,padding:"14px",marginBottom:12,background:paid?C.greenLight+"30":C.bgMuted}}>
             <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:paid?C.green:C.textFaint,letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,marginBottom:12}}>
-              {paid?"✓ Direct contacts":"🔒 Contacts locked"}
+              {paid?"✓ Direct contacts":"📞 Direct contact available"}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
               <span style={{fontSize:16,flexShrink:0}}>📞</span>
               {paid?(
                 <><a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}}>{job.phone||"—"}</a>{job.phone&&<CopyBtn text={job.phone}/>}</>
               ):(
-                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.textMid,filter:"blur(5px)",userSelect:"none",flex:1,fontWeight:600}}>{job.phone||"+61 x xxxx xxxx"}</span>
+                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.textMid,flex:1,fontWeight:700,letterSpacing:"0.05em"}}>{job.phone?job.phone.slice(0,6)+"·· ····":"+61 ·· ···· ····"}</span>
               )}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -384,30 +384,12 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               {paid?(
                 <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}}>{job.email||"—"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
               ):(
-                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,filter:"blur(5px)",userSelect:"none",flex:1}}>{job.email||"xxxxx@employer.com.au"}</span>
+                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1}}>{job.email?job.email.split("@")[0].slice(0,4)+"···@"+job.email.split("@")[1]:"···@employer.com.au"}</span>
               )}
             </div>
           </div>
-          {paid&&(job.instagram||job.facebook)&&(
-            <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
-              {job.instagram&&(
-                <a href={job.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:"#fdf2f8",border:"1px solid #f9a8d4",borderRadius:10,padding:"11px 14px",textDecoration:"none"}}>
-                  <span style={{fontSize:16}}>📸</span>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#9d174d",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.instagram.replace(/https?:\/\/(www\.)?instagram\.com\//,"@")}</span>
-                  <span style={{fontSize:12,color:"#9d174d",flexShrink:0}}>→</span>
-                </a>
-              )}
-              {job.facebook&&(
-                <a href={job.facebook} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:"#eff6ff",border:"1px solid #93c5fd",borderRadius:10,padding:"11px 14px",textDecoration:"none"}}>
-                  <span style={{fontSize:16}}>👥</span>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1d4ed8",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.facebook.replace(/https?:\/\/(www\.)?facebook\.com\//,"")}</span>
-                  <span style={{fontSize:12,color:"#1d4ed8",flexShrink:0}}>→</span>
-                </a>
-              )}
-            </div>
-          )}
           {!paid&&(
-            <button onClick={onUnlock} style={{width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)"}}>
+            <button onClick={onUnlock} style={{width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:12}}>
               🔓 Unlock all contacts — {PRICE}
             </button>
           )}
@@ -765,26 +747,19 @@ export default function JobFinder({onSwitchTab}){
                       </div>
                     </div>
                     {/* Location row */}
-                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:6}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:job.website?6:0}}>
                       <span style={{fontSize:11}}>📍</span>
                       <span style={{fontSize:11,fontWeight:500,color:C.textMid,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.city||job.state}{job.address?` · ${job.address}`:""}</span>
                       <a href={`https://maps.google.com/?q=${encodeURIComponent((job.city||job.state)+", Australia")}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:10,color:C.teal,fontWeight:600,textDecoration:"none",flexShrink:0}}>Map →</a>
                     </div>
-                    {/* Contact badges */}
-                    <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
-                      {[
-                        {label:"Phone",    val:job.phone},
-                        {label:"Email",    val:job.email},
-                        {label:"Website",  val:job.website},
-                        {label:"Instagram",val:job.instagram},
-                        {label:"Facebook", val:job.facebook},
-                      ].map(({label,val})=>(
-                        <span key={label} style={{display:"flex",alignItems:"center",gap:4,padding:"3px 8px",borderRadius:20,fontSize:10,fontWeight:600,background:val?C.greenLight:C.bgMuted,color:val?C.green:C.textFaint,border:`1px solid ${val?C.greenBorder:C.border}`}}>
-                          <span style={{width:5,height:5,borderRadius:"50%",background:val?C.green:C.border,display:"inline-block",flexShrink:0}}/>
-                          {label}
-                        </span>
-                      ))}
-                    </div>
+                    {/* Website row */}
+                    {job.website&&(
+                      <div style={{display:"flex",alignItems:"center",gap:6,background:C.greenLight,borderRadius:8,padding:"6px 10px",border:`1px solid ${C.greenBorder}`}}>
+                        <span style={{fontSize:11}}>🌐</span>
+                        <a href={job.website} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:C.green,fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textDecoration:"none"}}>{job.website.replace(/https?:\/\/(www\.)?/,"")}</a>
+                        <span style={{fontSize:10,color:C.green,flexShrink:0}}>→</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -792,46 +767,26 @@ export default function JobFinder({onSwitchTab}){
 
             {/* Paywall */}
             {showWall&&(
-              <div style={{marginTop:12}}>
-                <div style={{position:"relative",overflow:"hidden",borderRadius:"14px 14px 0 0",border:`1px solid ${C.border}`,borderBottom:"none"}}>
-                  {sorted.slice(FREE_LIMIT,FREE_LIMIT+3).map((job,i)=>(
-                    <div key={i} style={{background:C.bgCard,padding:"14px 15px",borderBottom:i<2?`1px solid ${C.border}`:"none",filter:"blur(3px)",opacity:0.7,userSelect:"none"}}>
-                      <div style={{display:"flex",alignItems:"center",gap:10}}>
-                        <div style={{width:40,height:40,borderRadius:10,background:C.bgMuted,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{SECTOR_ICONS[job.sector]||"🏢"}</div>
-                        <div>
-                          <div style={{fontSize:14,fontWeight:700,color:C.text}}>{job.name}</div>
-                          <div style={{fontSize:11,color:C.textFaint}}>{job.city||job.state} · {job.sector}</div>
-                        </div>
-                        <div style={{marginLeft:"auto",fontSize:11,fontWeight:700,color:STATE_COLORS[job.state]||"#888"}}>{job.state}</div>
-                      </div>
+              <div style={{marginTop:12,background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:18,padding:"20px",textAlign:"center"}}>
+                <div style={{fontSize:24,marginBottom:8}}>🔒</div>
+                <div style={{fontFamily:"'Playfair Display',serif",fontSize:19,fontWeight:700,color:C.text,marginBottom:4}}>2,000+ direct employer contacts</div>
+                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:14,lineHeight:1.6}}>Updated contacts · Not random Google results</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,marginBottom:12}}>
+                  {[["2,000+","employers"],["7","states"],["$24.90","one-time"]].map(([n,l])=>(
+                    <div key={l} style={{background:C.bgMuted,borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
+                      <div style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:C.green,lineHeight:1}}>{n}</div>
+                      <div style={{fontSize:10,color:C.textFaint,marginTop:3}}>{l}</div>
                     </div>
                   ))}
-                  <div style={{position:"absolute",bottom:0,left:0,right:0,height:60,background:`linear-gradient(to bottom,transparent,${C.bg})`}}/>
                 </div>
-                <div style={{background:C.bgCard,border:`1px solid ${C.border}`,borderTop:"none",borderRadius:"0 0 18px 18px",padding:"20px",textAlign:"center"}}>
-                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:19,fontWeight:700,color:C.text,marginBottom:4}}>2,000+ direct employer contacts</div>
-                  <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:14,lineHeight:1.6}}>
-                    Updated contacts · Not random Google results
-                  </div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,marginBottom:16}}>
-                    {[["2,000+","employers"],["7","states"],["$24.90","one-time"]].map(([n,l])=>(
-                      <div key={l} style={{background:C.bgMuted,borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
-                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:C.green,lineHeight:1}}>{n}</div>
-                        <div style={{fontSize:10,color:C.textFaint,marginTop:3}}>{l}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginBottom:10}}>
-                    ✅ Lifetime access · One-time payment · No subscription
-                  </div>
-                  <button className="jf-cta" onClick={()=>setShowPayment(true)} style={{width:"100%",padding:"15px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",transition:"all 0.2s"}}>
-                    🔓 Unlock 2,000+ employer contacts — {PRICE}
-                  </button>
-                  <div style={{display:"flex",justifyContent:"center",gap:14,marginTop:10}}>
-                    {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
-                      <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
-                    ))}
-                  </div>
+                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginBottom:10}}>✅ Lifetime access · One-time payment · No subscription</div>
+                <button className="jf-cta" onClick={()=>setShowPayment(true)} style={{width:"100%",padding:"15px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",transition:"all 0.2s",marginBottom:10}}>
+                  🔓 Unlock 2,000+ employer contacts — {PRICE}
+                </button>
+                <div style={{display:"flex",justifyContent:"center",gap:14}}>
+                  {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
+                    <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
+                  ))}
                 </div>
               </div>
             )}
