@@ -368,7 +368,6 @@ function EmployerModal({job, onClose, paid, onUnlock}){
             </a>
           )}
           <div style={{borderRadius:14,overflow:"hidden",marginBottom:12,border:`1.5px solid ${paid?C.greenBorder:"#e8e3d9"}`}}>
-            {/* Header du bloc contacts */}
             <div style={{background:paid?"#edf7f1":"#1a7a4a",padding:"10px 14px",display:"flex",alignItems:"center",gap:8}}>
               <span style={{fontSize:14}}>{paid?"✓":"🔒"}</span>
               <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:700,color:paid?C.green:"#fff",letterSpacing:"0.08em",textTransform:"uppercase"}}>
@@ -381,12 +380,10 @@ function EmployerModal({job, onClose, paid, onUnlock}){
                 {paid?(
                   <><a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}}>{job.phone||"—"}</a>{job.phone&&<CopyBtn text={job.phone}/>}</>
                 ):(
-                  <div style={{flex:1}}>
-                    <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:700,color:"#1a1a18",letterSpacing:"0.04em",filter:"blur(4px)",userSelect:"none"}}>{job.phone||"+61 7 4153 xxxx"}</div>
-                  </div>
+                  <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:700,color:"#1a1a18",flex:1,filter:"blur(4px)",userSelect:"none"}}>{job.phone||"+61 7 4153 xxxx"}</div>
                 )}
               </div>
-              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:paid?0:0}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
                 <span style={{fontSize:16,flexShrink:0}}>✉️</span>
                 {paid?(
                   <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}}>{job.email||"—"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
@@ -394,14 +391,37 @@ function EmployerModal({job, onClose, paid, onUnlock}){
                   <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1a1a18",flex:1,filter:"blur(4px)",userSelect:"none"}}>{job.email||"hiring@employer.com.au"}</div>
                 )}
               </div>
+              {paid&&job.instagram&&(
+                <a href={job.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#fdf2f8",border:"1px solid #f9a8d4",borderRadius:8,padding:"8px 10px",textDecoration:"none",marginBottom:8}}>
+                  <span style={{fontSize:14}}>📸</span>
+                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"#9d174d",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.instagram.replace(/https?:\/\/(www\.)?instagram\.com\//,"@")}</span>
+                  <span style={{fontSize:11,color:"#9d174d"}}>→</span>
+                </a>
+              )}
+              {paid&&job.facebook&&(
+                <a href={job.facebook} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#eff6ff",border:"1px solid #93c5fd",borderRadius:8,padding:"8px 10px",textDecoration:"none"}}>
+                  <span style={{fontSize:14}}>👥</span>
+                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"#1d4ed8",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.facebook.replace(/https?:\/\/(www\.)?facebook\.com\//,"")}</span>
+                  <span style={{fontSize:11,color:"#1d4ed8"}}>→</span>
+                </a>
+              )}
+              {!paid&&(
+                <div style={{display:"flex",gap:6,marginTop:4}}>
+                  {[["📸","Instagram"],["👥","Facebook"],["📍","By distance"]].map(([icon,label])=>(
+                    <div key={label} style={{flex:1,background:"#f5f3ee",borderRadius:8,padding:"7px 4px",textAlign:"center"}}>
+                      <div style={{fontSize:15,marginBottom:2}}>{icon}</div>
+                      <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:"#9a9488",fontWeight:600}}>{label}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-          {/* CTA unlock — seulement si non payé */}
           {!paid&&(
             <div style={{marginBottom:12}}>
-              <button onClick={onUnlock} style={{width:"100%",padding:"16px",borderRadius:13,border:"none",background:"#1a7a4a",color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:8,boxSizing:"border-box"}}>
+              <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{display:"flex",width:"100%",padding:"16px",borderRadius:13,background:"#1a7a4a",color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:8,textDecoration:"none",boxSizing:"border-box"}}>
                 🔓 Unlock all contacts — {PRICE}
-              </button>
+              </a>
               <div style={{display:"flex",justifyContent:"center",gap:14}}>
                 {["🔐 Secure","⚡ Instant","✅ Lifetime"].map(t=>(
                   <span key={t} style={{fontSize:10,color:C.textFaint,fontFamily:"'DM Sans',sans-serif"}}>{t}</span>
@@ -763,19 +783,26 @@ export default function JobFinder({onSwitchTab}){
                       </div>
                     </div>
                     {/* Location row */}
-                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:job.website?6:0}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:6}}>
                       <span style={{fontSize:11}}>📍</span>
                       <span style={{fontSize:11,fontWeight:500,color:C.textMid,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.city||job.state}{job.address?` · ${job.address}`:""}</span>
                       <a href={`https://maps.google.com/?q=${encodeURIComponent((job.city||job.state)+", Australia")}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:10,color:C.teal,fontWeight:600,textDecoration:"none",flexShrink:0}}>Map →</a>
                     </div>
-                    {/* Website row */}
-                    {job.website&&(
-                      <div style={{display:"flex",alignItems:"center",gap:6,background:C.greenLight,borderRadius:8,padding:"6px 10px",border:`1px solid ${C.greenBorder}`}}>
-                        <span style={{fontSize:11}}>🌐</span>
-                        <a href={job.website} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:C.green,fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textDecoration:"none"}}>{job.website.replace(/https?:\/\/(www\.)?/,"")}</a>
-                        <span style={{fontSize:10,color:C.green,flexShrink:0}}>→</span>
-                      </div>
-                    )}
+                    {/* Contact badges */}
+                    <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
+                      {[
+                        {label:"Phone",    val:job.phone},
+                        {label:"Email",    val:job.email},
+                        {label:"Website",  val:job.website},
+                        {label:"Instagram",val:job.instagram},
+                        {label:"Facebook", val:job.facebook},
+                      ].map(({label,val})=>(
+                        <span key={label} style={{display:"flex",alignItems:"center",gap:4,padding:"3px 8px",borderRadius:20,fontSize:10,fontWeight:600,background:val?C.greenLight:C.bgMuted,color:val?C.green:C.textFaint,border:`1px solid ${val?C.greenBorder:C.border}`}}>
+                          <span style={{width:5,height:5,borderRadius:"50%",background:val?C.green:C.border,display:"inline-block",flexShrink:0}}/>
+                          {label}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 );
               })}
