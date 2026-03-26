@@ -564,6 +564,21 @@ function Toast({msg,ok}){
   );
 }
 
+function FindWorkBanner({onSwitchTab}){
+  return(
+    <div onClick={()=>onSwitchTab("jobs")} style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 4px 16px rgba(26,122,74,0.25)",marginTop:12}}>
+      <div style={{fontSize:26}}>🔍</div>
+      <div style={{flex:1}}>
+        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"#fff",marginBottom:2}}>Find your employer directly</div>
+        <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"rgba(255,255,255,0.7)"}}>2,000+ contacts · Phone, email, Instagram · All 7 states</div>
+      </div>
+      <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,color:"#fff",background:"rgba(255,255,255,0.15)",borderRadius:8,padding:"6px 12px",border:"1px solid rgba(255,255,255,0.2)",flexShrink:0}}>
+        Browse →
+      </div>
+    </div>
+  );
+}
+
 export default function VisaRunApp({onSwitchTab}){
   const[entries,setEntries]=useState([]);
   const[goal,setGoal]=useState(88);
@@ -678,57 +693,50 @@ export default function VisaRunApp({onSwitchTab}){
 
       <FiscalBanner/>
       <HeroProgress totalDays={totalDays} goal={goal} onGoalChange={setGoal} rooJump={rooJump}/>
-      <StatCards totals={totals}/>
-
-      {/* Find a Job CTA banner */}
-      {onSwitchTab&&(
-        <div style={{maxWidth:600,margin:"0 auto",padding:"0 20px 4px"}}>
-          <div onClick={()=>onSwitchTab("jobs")} style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 4px 16px rgba(26,122,74,0.25)",marginBottom:4}}>
-            <div style={{fontSize:28}}>🔍</div>
-            <div style={{flex:1}}>
-              <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"#fff",marginBottom:2}}>Ready to find your farm job?</div>
-              <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"rgba(255,255,255,0.7)"}}>2,167+ direct employer contacts · Phone & email</div>
-            </div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,color:"#fff",background:"rgba(255,255,255,0.15)",borderRadius:8,padding:"6px 12px",border:"1px solid rgba(255,255,255,0.2)",flexShrink:0}}>
-              Browse →
-            </div>
-          </div>
-        </div>
-      )}
 
       <div style={{maxWidth:600,margin:"0 auto",padding:"0 20px 40px"}}>
         <input ref={fileRef} type="file" accept=".pdf,image/*" multiple style={{display:"none"}} onChange={e=>processFiles(Array.from(e.target.files))}/>
         {sorted.length===0&&(
           <div style={{paddingTop:8}}>
-            <div className="drop-zone" onClick={()=>fileRef.current?.click()} style={{border:`2px dashed ${dragging?C.green:C.greenBorder}`,borderRadius:16,padding:"32px 24px",textAlign:"center",cursor:"pointer",marginBottom:12,background:dragging?C.greenBg:C.bgCard,boxShadow:C.shadow}}>
-              <div style={{fontSize:64,lineHeight:1,marginBottom:12,display:"inline-block",filter:"drop-shadow(0 4px 12px rgba(26,122,74,0.2))"}}>🦘</div>
-              <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:C.text,marginBottom:4,lineHeight:1.3}}>
-                Your second year<br/><span style={{color:C.green,fontStyle:"italic"}}>starts here.</span>
-              </div>
-              <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:16}}>
-                {dragging?"Drop it! 🎯":"Drop your payslip — we'll count your days."}
-              </div>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:16}}>
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{width:40,height:40,borderRadius:12,background:"#fee2e2",border:"1px solid #fca5a5",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>📄</div>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,fontWeight:700,color:C.textFaint,letterSpacing:"0.08em"}}>PDF</span>
+            <div
+              className="drop-zone"
+              onClick={()=>fileRef.current?.click()}
+              style={{background:dragging?C.greenBg:C.bgCard,border:`2px dashed ${dragging?C.green:C.greenBorder}`,borderRadius:16,padding:"20px",marginBottom:12,boxShadow:C.shadow,cursor:"pointer"}}
+            >
+              {/* Titre */}
+              <div style={{textAlign:"center",marginBottom:16}}>
+                <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:C.text,marginBottom:4,lineHeight:1.3}}>
+                  {dragging?"Drop it! 🎯 ":"Scan your payslip."}
                 </div>
-                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint}}>or</div>
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{width:40,height:40,borderRadius:12,background:"#ede9fe",border:"1px solid #c4b5fd",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>📸</div>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,fontWeight:700,color:C.textFaint,letterSpacing:"0.08em"}}>SCREENSHOT</span>
+                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint}}>
+                  AI reads it in seconds · Your days are counted automatically.
                 </div>
               </div>
-              <div style={{borderTop:`1px solid ${C.border}`,paddingTop:12}}>
-                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.textFaint,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:8,fontWeight:600}}>Works with</div>
-                <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:6}}>
-                  {["Xero","MYOB","Employment Hero","KeyPay","Payroller","QuickBooks"].map(name=>(
-                    <span key={name} style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,fontWeight:600,color:C.textMid,background:C.bgMuted,border:`1px solid ${C.border}`,borderRadius:6,padding:"3px 8px"}}>{name}</span>
-                  ))}
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,fontWeight:600,color:C.textFaint,background:"transparent",border:`1px dashed ${C.border}`,borderRadius:6,padding:"3px 8px",fontStyle:"italic"}}>& many more…</span>
-                </div>
+              {/* Bouton CTA principal */}
+              <button
+                onClick={e=>{e.stopPropagation();fileRef.current?.click();}}
+                style={{width:"100%",padding:"15px",borderRadius:12,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:9,marginBottom:12,boxSizing:"border-box",boxShadow:"0 4px 16px rgba(26,122,74,0.25)"}}
+              >
+                <span style={{fontSize:18}}>📄</span> Scan my payslip
+              </button>
+              {/* Format + vitesse */}
+              <div style={{display:"flex",justifyContent:"center",gap:16,marginBottom:14}}>
+                {[["📄","PDF"],["📸","Photo"],["⚡","5 sec"]].map(([icon,label])=>(
+                  <div key={label} style={{display:"flex",alignItems:"center",gap:4,fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.textFaint,fontWeight:600}}>
+                    <span style={{fontSize:12}}>{icon}</span>{label}
+                  </div>
+                ))}
+              </div>
+              {/* Works with */}
+              <div style={{borderTop:`1px solid ${C.border}`,paddingTop:12,display:"flex",flexWrap:"wrap",justifyContent:"center",gap:5}}>
+                {["Xero","MYOB","Employment Hero","KeyPay","Payroller","QuickBooks"].map(name=>(
+                  <span key={name} style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,fontWeight:600,color:C.textMid,background:C.bgMuted,border:`1px solid ${C.border}`,borderRadius:6,padding:"3px 8px"}}>{name}</span>
+                ))}
+                <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.textFaint,border:`1px dashed ${C.border}`,borderRadius:6,padding:"3px 8px",fontStyle:"italic"}}>& more</span>
               </div>
             </div>
+            <StatCards totals={totals}/>
+            {onSwitchTab&&<FindWorkBanner onSwitchTab={onSwitchTab}/>}
           </div>
         )}
         {sorted.length>0&&(
@@ -739,11 +747,11 @@ export default function VisaRunApp({onSwitchTab}){
               <div style={{fontFamily:"'Playfair Display',serif",fontSize:11,fontStyle:"italic",color:C.teal}}>{fmtN(entries.reduce((s,e)=>s+(e.farmDays??0),0))} days accumulated</div>
             </div>
             {sorted.map((e,i)=><EntryCard key={e.filename+i} entry={e} index={i} isLast={i===sorted.length-1} onDelete={deleteEntry} onEdit={editEntry}/>)}
-            <div className="drop-zone" onClick={()=>fileRef.current?.click()} style={{border:`2px dashed ${dragging?C.green:C.border}`,borderRadius:12,padding:"14px 20px",textAlign:"center",cursor:"pointer",marginTop:20,background:dragging?C.greenBg:"transparent",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
+            <div className="drop-zone" onClick={()=>fileRef.current?.click()} style={{border:`2px dashed ${dragging?C.green:C.greenBorder}`,borderRadius:12,padding:"14px 20px",textAlign:"center",cursor:"pointer",marginTop:12,background:dragging?C.greenBg:C.greenLight,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
               <span style={{fontSize:16}}>📄</span>
-              <span style={{fontSize:14}}>📸</span>
-              <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:C.textFaint,fontWeight:500}}>Add a payslip · <span style={{color:C.teal}}>Browse</span></span>
+              <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:C.green,fontWeight:700}}>Add a payslip · <span style={{fontWeight:400,color:C.teal}}>PDF or photo</span></span>
             </div>
+            {onSwitchTab&&<FindWorkBanner onSwitchTab={onSwitchTab}/>}
           </>
         )}
       </div>
