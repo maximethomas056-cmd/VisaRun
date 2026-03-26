@@ -380,6 +380,25 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               )}
             </div>
           </div>
+          {/* Social links Instagram + Facebook — visibles uniquement si payé */}
+          {paid&&(job.instagram||job.facebook)&&(
+            <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
+              {job.instagram&&(
+                <a href={job.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:"#fdf2f8",border:"1px solid #f9a8d4",borderRadius:10,padding:"11px 14px",textDecoration:"none"}}>
+                  <span style={{fontSize:16}}>📸</span>
+                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#9d174d",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.instagram.replace(/https?:\/\/(www\.)?instagram\.com\//,"@")}</span>
+                  <span style={{fontSize:12,color:"#9d174d",flexShrink:0}}>→</span>
+                </a>
+              )}
+              {job.facebook&&(
+                <a href={job.facebook} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:"#eff6ff",border:"1px solid #93c5fd",borderRadius:10,padding:"11px 14px",textDecoration:"none"}}>
+                  <span style={{fontSize:16}}>👥</span>
+                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1d4ed8",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.facebook.replace(/https?:\/\/(www\.)?facebook\.com\//,"")}</span>
+                  <span style={{fontSize:12,color:"#1d4ed8",flexShrink:0}}>→</span>
+                </a>
+              )}
+            </div>
+          )}
           {!paid&&(
             <button onClick={onUnlock} style={{width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)"}}>
               🔓 Unlock all contacts — {PRICE}
@@ -739,19 +758,26 @@ export default function JobFinder({onSwitchTab}){
                       </div>
                     </div>
                     {/* Location row */}
-                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:job.website?6:0}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:6}}>
                       <span style={{fontSize:11}}>📍</span>
                       <span style={{fontSize:11,fontWeight:500,color:C.textMid,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.city||job.state}{job.address?` · ${job.address}`:""}</span>
                       <a href={`https://maps.google.com/?q=${encodeURIComponent((job.city||job.state)+", Australia")}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:10,color:C.teal,fontWeight:600,textDecoration:"none",flexShrink:0}}>Map →</a>
                     </div>
-                    {/* Website row */}
-                    {job.website&&(
-                      <div style={{display:"flex",alignItems:"center",gap:6,background:C.greenLight,borderRadius:8,padding:"6px 10px",border:`1px solid ${C.greenBorder}`}}>
-                        <span style={{fontSize:11}}>🌐</span>
-                        <a href={job.website} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:C.green,fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textDecoration:"none"}}>{job.website.replace(/https?:\/\/(www\.)?/,"")}</a>
-                        <span style={{fontSize:10,color:C.green,flexShrink:0}}>→</span>
-                      </div>
-                    )}
+                    {/* Contact badges */}
+                    <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
+                      {[
+                        {label:"Phone",   val:job.phone},
+                        {label:"Email",   val:job.email},
+                        {label:"Website", val:job.website},
+                        {label:"Instagram",val:job.instagram},
+                        {label:"Facebook", val:job.facebook},
+                      ].map(({label,val})=>(
+                        <span key={label} style={{display:"flex",alignItems:"center",gap:4,padding:"3px 8px",borderRadius:20,fontSize:10,fontWeight:600,background:val?C.greenLight:C.bgMuted,color:val?C.green:C.textFaint,border:`1px solid ${val?C.greenBorder:C.border}`}}>
+                          <span style={{width:5,height:5,borderRadius:"50%",background:val?C.green:C.border,display:"inline-block",flexShrink:0}}/>
+                          {label}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 );
               })}
