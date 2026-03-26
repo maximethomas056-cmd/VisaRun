@@ -263,34 +263,42 @@ function PaymentModal({onClose, onAlreadyPaid}){
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:300,background:"rgba(26,26,24,0.7)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"jfFadeIn 0.2s ease"}}>
       <div onClick={e=>e.stopPropagation()} style={{background:C.bgCard,borderRadius:24,width:"100%",maxWidth:400,boxShadow:C.shadowLg,overflow:"hidden",animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
-        <div style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",padding:"28px 24px 24px",textAlign:"center"}}>
-          <div style={{width:64,height:64,background:"rgba(255,255,255,0.15)",borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",fontSize:36,margin:"0 auto 12px",border:"2px solid rgba(255,255,255,0.2)"}}>🦘</div>
-          <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#fff",marginBottom:4}}>Unlock all contacts</div>
-          <div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>One-time payment · Lifetime access</div>
+        <div style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",padding:"28px 24px 22px",textAlign:"center"}}>
+          <div style={{fontSize:38,marginBottom:10}}>🦘</div>
+          <div style={{fontFamily:"'Playfair Display',serif",fontSize:21,fontWeight:700,color:"#fff",marginBottom:5,lineHeight:1.2}}>Skip the agencies.</div>
+          <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#fff",marginBottom:8,lineHeight:1.2}}>Contact employers yourself.</div>
+          <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:"rgba(255,255,255,0.75)"}}>Find work anywhere in Australia — no middleman.</div>
         </div>
-        <div style={{padding:"20px 24px 24px"}}>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:20}}>
-            {[["📞","Direct phone numbers"],["✉️","Recruitment emails"],["🌐","Official websites"],["📍","Sort by proximity"]].map(([icon,label])=>(
-              <div key={label} style={{background:C.bgMuted,borderRadius:10,padding:"10px 12px",display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:16}}>{icon}</span>
+        <div style={{padding:"18px 20px 22px"}}>
+          <div style={{background:C.greenLight,border:`1px solid ${C.greenBorder}`,borderRadius:8,padding:"9px 13px",marginBottom:14,display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:14}}>📍</span>
+            <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.green,fontWeight:600}}>Jobs available now across all 7 states</span>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:14}}>
+            {[["📞","Direct phone"],["✉️","Recruitment email"],["🌐","Official website"],["📸","Instagram"],["👥","Facebook"],["📍","Sort by distance"]].map(([icon,label])=>(
+              <div key={label} style={{background:C.bgMuted,borderRadius:8,padding:"9px 11px",display:"flex",alignItems:"center",gap:7}}>
+                <span style={{fontSize:14}}>{icon}</span>
                 <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,color:C.text}}>{label}</span>
               </div>
             ))}
           </div>
-          <div style={{textAlign:"center",marginBottom:20}}>
+          <div style={{textAlign:"center",marginBottom:6}}>
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:40,fontWeight:700,color:C.green,lineHeight:1}}>{PRICE}</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginTop:4}}>{JOB_DATA.length.toLocaleString()} employers · Lifetime access</div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginTop:4}}>One-time · No subscription · Lifetime access</div>
+          </div>
+          <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,textAlign:"center",marginBottom:14}}>
+            Updated contacts · Not random Google results
           </div>
           <a href={STRIPE_URL} target="_blank" rel="noopener noreferrer" style={{display:"block",width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textAlign:"center",textDecoration:"none",boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
-            🔓 Unlock now — {PRICE}
+            🔓 Unlock 2,000+ employer contacts — {PRICE}
           </a>
-          <div style={{display:"flex",justifyContent:"center",gap:16,marginBottom:14}}>
+          <div style={{display:"flex",justifyContent:"center",gap:14,marginBottom:14}}>
             {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
               <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
             ))}
           </div>
-          <button onClick={onAlreadyPaid} style={{width:"100%",padding:"10px",borderRadius:10,border:`1.5px dashed ${C.border}`,background:"transparent",color:C.textFaint,fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8}}>
-            Already paid? Enter your email to unlock
+          <button onClick={onAlreadyPaid} style={{width:"100%",padding:"12px",borderRadius:10,border:`1.5px solid ${C.green}`,background:C.greenLight,color:C.green,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8}}>
+            ✓ Already paid? Click here to unlock
           </button>
           <button onClick={onClose} style={{width:"100%",padding:"10px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
             Close
@@ -380,25 +388,6 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               )}
             </div>
           </div>
-          {/* Social links Instagram + Facebook — visibles uniquement si payé */}
-          {paid&&(job.instagram||job.facebook)&&(
-            <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
-              {job.instagram&&(
-                <a href={job.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:"#fdf2f8",border:"1px solid #f9a8d4",borderRadius:10,padding:"11px 14px",textDecoration:"none"}}>
-                  <span style={{fontSize:16}}>📸</span>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#9d174d",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.instagram.replace(/https?:\/\/(www\.)?instagram\.com\//,"@")}</span>
-                  <span style={{fontSize:12,color:"#9d174d",flexShrink:0}}>→</span>
-                </a>
-              )}
-              {job.facebook&&(
-                <a href={job.facebook} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:"#eff6ff",border:"1px solid #93c5fd",borderRadius:10,padding:"11px 14px",textDecoration:"none"}}>
-                  <span style={{fontSize:16}}>👥</span>
-                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1d4ed8",fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.facebook.replace(/https?:\/\/(www\.)?facebook\.com\//,"")}</span>
-                  <span style={{fontSize:12,color:"#1d4ed8",flexShrink:0}}>→</span>
-                </a>
-              )}
-            </div>
-          )}
           {!paid&&(
             <button onClick={onUnlock} style={{width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)"}}>
               🔓 Unlock all contacts — {PRICE}
@@ -758,26 +747,19 @@ export default function JobFinder({onSwitchTab}){
                       </div>
                     </div>
                     {/* Location row */}
-                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:6}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:job.website?6:0}}>
                       <span style={{fontSize:11}}>📍</span>
                       <span style={{fontSize:11,fontWeight:500,color:C.textMid,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.city||job.state}{job.address?` · ${job.address}`:""}</span>
                       <a href={`https://maps.google.com/?q=${encodeURIComponent((job.city||job.state)+", Australia")}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:10,color:C.teal,fontWeight:600,textDecoration:"none",flexShrink:0}}>Map →</a>
                     </div>
-                    {/* Contact badges */}
-                    <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
-                      {[
-                        {label:"Phone",   val:job.phone},
-                        {label:"Email",   val:job.email},
-                        {label:"Website", val:job.website},
-                        {label:"Instagram",val:job.instagram},
-                        {label:"Facebook", val:job.facebook},
-                      ].map(({label,val})=>(
-                        <span key={label} style={{display:"flex",alignItems:"center",gap:4,padding:"3px 8px",borderRadius:20,fontSize:10,fontWeight:600,background:val?C.greenLight:C.bgMuted,color:val?C.green:C.textFaint,border:`1px solid ${val?C.greenBorder:C.border}`}}>
-                          <span style={{width:5,height:5,borderRadius:"50%",background:val?C.green:C.border,display:"inline-block",flexShrink:0}}/>
-                          {label}
-                        </span>
-                      ))}
-                    </div>
+                    {/* Website row */}
+                    {job.website&&(
+                      <div style={{display:"flex",alignItems:"center",gap:6,background:C.greenLight,borderRadius:8,padding:"6px 10px",border:`1px solid ${C.greenBorder}`}}>
+                        <span style={{fontSize:11}}>🌐</span>
+                        <a href={job.website} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:C.green,fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textDecoration:"none"}}>{job.website.replace(/https?:\/\/(www\.)?/,"")}</a>
+                        <span style={{fontSize:10,color:C.green,flexShrink:0}}>→</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -802,18 +784,25 @@ export default function JobFinder({onSwitchTab}){
                   <div style={{position:"absolute",bottom:0,left:0,right:0,height:60,background:`linear-gradient(to bottom,transparent,${C.bg})`}}/>
                 </div>
                 <div style={{background:C.bgCard,border:`1px solid ${C.border}`,borderTop:"none",borderRadius:"0 0 18px 18px",padding:"20px",textAlign:"center"}}>
-                  <div style={{fontSize:28,marginBottom:6}}>🔒</div>
-                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.text,marginBottom:4}}>+{lockedCount} more employers</div>
-                  <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:16,lineHeight:1.6}}>
-                    Phone · Email · Website for every employer.<br/>
-                    <strong style={{color:C.text}}>One call = your 88 days sorted.</strong>
+                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:19,fontWeight:700,color:C.text,marginBottom:4}}>2,000+ direct employer contacts</div>
+                  <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:14,lineHeight:1.6}}>
+                    Updated contacts · Not random Google results
                   </div>
-                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:32,fontWeight:700,color:C.green,marginBottom:4}}>{PRICE}</div>
-                  <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginBottom:14}}>Lifetime access · One-time payment</div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,marginBottom:16}}>
+                    {[["2,000+","employers"],["7","states"],["$24.90","one-time"]].map(([n,l])=>(
+                      <div key={l} style={{background:C.bgMuted,borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
+                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:C.green,lineHeight:1}}>{n}</div>
+                        <div style={{fontSize:10,color:C.textFaint,marginTop:3}}>{l}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginBottom:10}}>
+                    ✅ Lifetime access · One-time payment · No subscription
+                  </div>
                   <button className="jf-cta" onClick={()=>setShowPayment(true)} style={{width:"100%",padding:"15px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",transition:"all 0.2s"}}>
-                    🔓 Unlock all employers — {PRICE}
+                    🔓 Unlock 2,000+ employer contacts — {PRICE}
                   </button>
-                  <div style={{display:"flex",justifyContent:"center",gap:16,marginTop:10}}>
+                  <div style={{display:"flex",justifyContent:"center",gap:14,marginTop:10}}>
                     {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
                       <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
                     ))}
