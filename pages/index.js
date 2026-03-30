@@ -158,6 +158,10 @@ export default function App() {
     } catch {}
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({top: 0, behavior: "instant"});
+  }, [activeTab]);
+
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
       <Head>
@@ -221,7 +225,7 @@ export default function App() {
             return (
               <button
                 key={tab.id}
-                onClick={() => { setActiveTab(tab.id); setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),0); }}
+                onClick={() => setActiveTab(tab.id)}
                 style={{
                   flex: 1,
                   padding: "13px 0 11px",
