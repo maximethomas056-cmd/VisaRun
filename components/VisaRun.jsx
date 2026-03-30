@@ -691,7 +691,6 @@ export default function VisaRunApp({onSwitchTab}){
         </div>
       </div>
 
-      {sorted.length>0&&<FiscalBanner/>}
       {sorted.length>0&&<HeroProgress totalDays={totalDays} goal={goal} onGoalChange={setGoal} rooJump={rooJump}/>}
       {sorted.length>0&&<StatCards totals={totals}/>}
 

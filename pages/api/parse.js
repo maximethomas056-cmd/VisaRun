@@ -1,6 +1,9 @@
 export const config = {
-  api: { bodyParser: { sizeLimit: "12mb" } },
+  api: { bodyParser: { sizeLimit: "6mb" } },
 };
+
+const ALLOWED_MODEL = "claude-haiku-4-5-20251001";
+const MAX_TOKENS = 1000;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -12,7 +15,8 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: { message: "API key not configured" } });
   }
 
-  if (!req.body || !req.body.model || !req.body.messages) {
+  const { messages } = req.body || {};
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: { message: "Invalid request body" } });
   }
 
@@ -25,7 +29,11 @@ export default async function handler(req, res) {
         "x-api-key": ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
       },
-      body: JSON.stringify(req.body),
+      body: JSON.stringify({
+        model: ALLOWED_MODEL,
+        max_tokens: MAX_TOKENS,
+        messages,
+      }),
     });
   } catch (networkError) {
     return res.status(502).json({ error: { message: "Network error: " + networkError.message } });

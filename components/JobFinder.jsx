@@ -346,15 +346,6 @@ function EmployerModal({job, onClose, paid, onUnlock}){
         </div>
         {/* Contenu scrollable */}
         <div style={{overflowY:"auto",flex:1,padding:"16px 20px 8px"}}>
-          {job.score>0&&(
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,background:C.bgMuted,borderRadius:10,padding:"10px 14px"}}>
-              <div style={{display:"flex",gap:2}}>
-                {[1,2,3,4,5].map(i=><span key={i} style={{fontSize:14,color:i<=Math.round(job.score)?"#f59e0b":"#e2e8f0"}}>★</span>)}
-              </div>
-              <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,color:C.text}}>{job.score}</span>
-              {job.reviews>0&&<span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint}}>({job.reviews.toLocaleString()} reviews)</span>}
-            </div>
-          )}
           <div style={{background:C.bgMuted,borderRadius:10,padding:"12px 14px",marginBottom:12}}>
             <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.textFaint,letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,marginBottom:6}}>Location</div>
             <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
@@ -463,6 +454,7 @@ export default function JobFinder({onSwitchTab}){
   const[emailInput,setEmailInput]=useState("");
   const[emailChecking,setEmailChecking]=useState(false);
   const[emailError,setEmailError]=useState("");
+  const[distRadius,setDistRadius]=useState(0);
   const savedHydrated=useRef(false);
   const searchRef=useRef();
 
@@ -582,8 +574,15 @@ export default function JobFinder({onSwitchTab}){
       const q=search.toLowerCase();
       if(!j.name.toLowerCase().includes(q)&&!(j.city||"").toLowerCase().includes(q))return false;
     }
+    // Filtre par distance si ville sélectionnée et radius > 0
+    if(cityCoords&&distRadius>0){
+      const c=CITY_COORDS[j.city];
+      if(!c)return false;
+      const d=haversine(cityCoords.lat,cityCoords.lng,c.lat,c.lng);
+      if(d>distRadius)return false;
+    }
     return true;
-  }),[sector,stateF,search,searchMode,showSavedOnly,saved]);
+  }),[sector,stateF,search,searchMode,showSavedOnly,saved,cityCoords,distRadius]);
 
   const sorted=useMemo(()=>{
     if(cityCoords){
@@ -633,13 +632,13 @@ export default function JobFinder({onSwitchTab}){
       <div style={{background:"linear-gradient(135deg,#1a7a4a 0%,#0d3d22 100%)",padding:"22px 18px 20px"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
           <div>
-            <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>Find your farm job.</div>
-            <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontStyle:"italic",color:"rgba(255,255,255,0.7)"}}>Stay a second year.</div>
+            <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>Find employers directly.</div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginTop:3}}>2,000+ contacts · No middleman · No agency fees</div>
           </div>
           {!paid?(
-            <button onClick={()=>setShowEmailModal(true)} className="jf-cta" style={{background:"rgba(255,255,255,0.15)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:10,padding:"8px 14px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.2s",backdropFilter:"blur(4px)",flexShrink:0}}>
-              🔓 Unlock {PRICE}
-            </button>
+            <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" className="jf-cta" style={{background:"#fff",borderRadius:10,padding:"8px 14px",color:C.green,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.2s",flexShrink:0,textDecoration:"none",display:"flex",alignItems:"center",gap:5}}>
+              🔓 {PRICE}
+            </a>
           ):(
             <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>✓ Full access</div>
           )}
@@ -647,8 +646,9 @@ export default function JobFinder({onSwitchTab}){
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           {[
             ["📞","Direct phone"],
-            ["✉️","Recruitment email"],
-            ["🗺️","All 7 states"],
+            ["✉️","Email"],
+            ["📸","Instagram"],
+            ["👥","Facebook"],
           ].map(([icon,label])=>(
             <div key={label} style={{display:"flex",alignItems:"center",gap:5,background:"rgba(255,255,255,0.12)",borderRadius:8,padding:"5px 10px",border:"1px solid rgba(255,255,255,0.15)"}}>
               <span style={{fontSize:12}}>{icon}</span>
@@ -660,24 +660,22 @@ export default function JobFinder({onSwitchTab}){
 
       <div style={{maxWidth:580,margin:"0 auto",padding:"14px 14px 140px"}}>
 
-        {/* Smart search bar */}
+        {/* Search bar */}
         <div style={{marginBottom:12,position:"relative"}}>
           <div style={{position:"relative"}}>
             <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:15,pointerEvents:"none"}}>
-              {searchMode==="city"?"📍":searchMode==="employer"?"🔍":"🔍"}
+              {searchMode==="city"?"📍":"🔍"}
             </span>
             <input
               ref={searchRef}
               className="jf-input"
               value={search}
               onChange={e=>handleSearchChange(e.target.value)}
-              placeholder="Search by employer or city…"
+              placeholder="Search by city or employer…"
               style={{width:"100%",padding:"12px 36px 12px 38px",borderRadius:12,border:`1.5px solid ${searchMode==="city"?C.green:C.border}`,background:C.bgCard,fontSize:13,fontFamily:"'DM Sans',sans-serif",color:C.text,boxSizing:"border-box",transition:"border-color 0.2s"}}
             />
             {search&&<button onClick={clearSearch} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",fontSize:16,color:C.textFaint,cursor:"pointer"}}>✕</button>}
           </div>
-
-          {/* City suggestions dropdown */}
           {suggestions.length>0&&(
             <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:12,boxShadow:C.shadowLg,zIndex:50,overflow:"hidden"}}>
               <div style={{padding:"8px 12px 4px",fontSize:9,color:C.textFaint,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600}}>Cities nearby</div>
@@ -690,10 +688,27 @@ export default function JobFinder({onSwitchTab}){
             </div>
           )}
 
-          {/* Active city indicator */}
+          {/* Active city indicator + slider distance */}
           {searchMode==="city"&&cityCoords&&(
-            <div style={{marginTop:6,fontSize:11,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
-              <span>✓</span> Sorted by distance from {cityName}
+            <div style={{marginTop:8,background:C.bgCard,border:`1px solid ${C.greenBorder}`,borderRadius:10,padding:"10px 14px"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+                <div style={{fontSize:11,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                  <span>📍</span> {cityName}
+                </div>
+                <span style={{fontSize:11,color:C.green,fontWeight:700}}>{distRadius===0?"Any distance":`Within ${distRadius}km`}</span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={500}
+                step={25}
+                value={distRadius}
+                onChange={e=>setDistRadius(Number(e.target.value))}
+                style={{width:"100%",accentColor:C.green,cursor:"pointer"}}
+              />
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:C.textFaint,marginTop:2}}>
+                <span>Nearby</span><span>250km</span><span>Any</span>
+              </div>
             </div>
           )}
         </div>
@@ -764,8 +779,9 @@ export default function JobFinder({onSwitchTab}){
                 const sc=STATE_COLORS[job.state]||"#888";
                 const dist=getDistLabel(job);
                 return(
-                  <div key={job.name+i} className="jf-card" onClick={()=>setSelectedJob(job)}
-                    style={{background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:14,padding:"14px 15px",boxShadow:C.shadow,animation:`jfRowIn 0.3s ease ${Math.min(i,8)*0.04}s both`}}>
+                  <div key={job.name+i} className="jf-card"
+                    onClick={()=>setSelectedJob(job)}
+                    style={{background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:14,padding:"14px 15px",boxShadow:C.shadow,animation:`jfRowIn 0.3s ease ${Math.min(i,8)*0.04}s both`,cursor:"pointer"}}>
                     {/* Top row */}
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
                       <div style={{width:40,height:40,borderRadius:10,background:C.bgMuted,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>
@@ -821,7 +837,7 @@ export default function JobFinder({onSwitchTab}){
 
             {/* Paywall */}
             {showWall&&(
-              <div style={{marginTop:12,background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:18,padding:"20px",textAlign:"center"}}>
+              <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{display:"block",marginTop:12,background:C.bgCard,border:`1.5px solid ${C.greenBorder}`,borderRadius:18,padding:"20px",textAlign:"center",textDecoration:"none",cursor:"pointer"}}>
                 <div style={{fontSize:24,marginBottom:8}}>🔒</div>
                 <div style={{fontFamily:"'Playfair Display',serif",fontSize:19,fontWeight:700,color:C.text,marginBottom:4}}>2,000+ direct employer contacts</div>
                 <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:14,lineHeight:1.6}}>Updated contacts · Not random Google results</div>
@@ -834,15 +850,15 @@ export default function JobFinder({onSwitchTab}){
                   ))}
                 </div>
                 <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginBottom:10}}>✅ Lifetime access · One-time payment · No subscription</div>
-                <button className="jf-cta" onClick={()=>setShowPayment(true)} style={{width:"100%",padding:"15px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",transition:"all 0.2s",marginBottom:10}}>
+                <div style={{width:"100%",padding:"15px",borderRadius:13,background:C.green,color:"#fff",fontSize:15,fontWeight:700,fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
                   🔓 Unlock 2,000+ employer contacts — {PRICE}
-                </button>
+                </div>
                 <div style={{display:"flex",justifyContent:"center",gap:14}}>
                   {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
                     <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
                   ))}
                 </div>
-              </div>
+              </a>
             )}
 
             {paid&&(
