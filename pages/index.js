@@ -253,10 +253,11 @@ export default function App() {
         position: "sticky",
         top: 0,
         zIndex: 100,
-        background: "rgba(255,255,255,0.97)",
+        background: activeTab === "jobs" ? "#0d3d22" : "rgba(255,255,255,0.97)",
         backdropFilter: "blur(12px)",
-        borderBottom: `1px solid ${C.border}`,
-        boxShadow: "0 1px 12px rgba(0,0,0,0.06)",
+        borderBottom: activeTab === "jobs" ? "1px solid rgba(255,255,255,0.1)" : `1px solid ${C.border}`,
+        boxShadow: "0 1px 12px rgba(0,0,0,0.08)",
+        transition: "background 0.3s",
       }}>
         <div style={{
           display: "flex",
@@ -265,6 +266,7 @@ export default function App() {
         }}>
           {tabs.map(tab => {
             const active = activeTab === tab.id;
+            const isJobsTab = activeTab === "jobs";
             return (
               <button
                 key={tab.id}
@@ -287,7 +289,7 @@ export default function App() {
                   fontSize: 20,
                   lineHeight: 1,
                   filter: active ? "none" : "grayscale(50%)",
-                  opacity: active ? 1 : 0.55,
+                  opacity: active ? 1 : 0.5,
                   transition: "all 0.2s",
                   transform: active ? "scale(1.08)" : "scale(1)",
                 }}>{tab.icon}</span>
@@ -295,7 +297,7 @@ export default function App() {
                   fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: "0.06em",
-                  color: active ? C.green : C.textFaint,
+                  color: active ? (isJobsTab ? "#fff" : C.green) : (isJobsTab ? "rgba(255,255,255,0.5)" : C.textFaint),
                   fontFamily: "'DM Sans',sans-serif",
                   transition: "color 0.2s",
                 }}>{tab.label.toUpperCase()}</span>
@@ -308,7 +310,7 @@ export default function App() {
                   transform: "translateX(-50%)",
                   width: active ? 36 : 0,
                   height: 2.5,
-                  background: C.green,
+                  background: activeTab === "jobs" ? "#fff" : C.green,
                   borderRadius: "2px 2px 0 0",
                   transition: "width 0.25s cubic-bezier(.34,1.56,.64,1)",
                 }}/>
