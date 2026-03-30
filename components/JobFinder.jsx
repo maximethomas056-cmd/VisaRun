@@ -662,6 +662,7 @@ export default function JobFinder({onSwitchTab}){
           <div style={{position:"relative"}}>
             <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:15,pointerEvents:"none"}}>
               {searchMode==="city"?"📍":"🔍"}
+            </span>
             <input
               ref={searchRef}
               className="jf-input"
