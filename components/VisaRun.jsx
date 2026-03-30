@@ -655,7 +655,7 @@ export default function VisaRunApp({onSwitchTab}){
             : {gross:0,net:0,tax:0,super:0,abn:"",name:"Employee",employer:"",date:"",hoursWorked:0,periodDays:0,farmDays:0,valid:false};
         }
         setScanning(draft);
-        await new Promise(r=>setTimeout(r,800));
+        await new Promise(r=>setTimeout(r,1800));
         setScanning(null);
         setModal({draft,filename:file.name,editMode:false});
         await new Promise(r=>{resolver.current=r;});
