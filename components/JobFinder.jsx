@@ -318,7 +318,9 @@ function EmployerModal({job, onClose, paid, onUnlock}){
   const sc=STATE_COLORS[job.state]||"#888";
   const igHandle=job.instagram?job.instagram.replace(/https?:\/\/(www\.)?instagram\.com\//,"@").replace(/\/$/,""):"";
   const fbIsNumeric=job.facebook&&/\/\d+\/?$/.test(job.facebook);
-  const fbLabel=fbIsNumeric?`${job.name} · Facebook`:job.facebook?job.facebook.replace(/https?:\/\/(www\.)?facebook\.com\//,"").replace(/\/$/,""):"";
+  const fbIsProfile=job.facebook&&/profil\.php|profile\.php/i.test(job.facebook);
+  const fbUrl=(fbIsNumeric||fbIsProfile)?null:job.facebook;
+  const fbLabel=fbUrl?fbUrl.replace(/https?:\/\/(www\.)?facebook\.com\//,"").replace(/\/$/,""):`${job.name} · Facebook`;
   const INSTA_SVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#9d174d" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#9d174d" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="#9d174d"/></svg>`;
   const FB_SVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="#1d4ed8" xmlns="http://www.w3.org/2000/svg"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>`;
   return(
@@ -365,39 +367,40 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               <span style={{fontSize:12,color:C.green,flexShrink:0}}>→</span>
             </a>
           )}
-          <div style={{borderRadius:14,overflow:"hidden",marginBottom:8,border:`1.5px solid ${paid?C.greenBorder:"#e8e3d9"}`}}>
+          <a href={paid?"#":"https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00"} target={paid?"_self":"_blank"} rel="noopener noreferrer" onClick={e=>{if(paid)e.preventDefault();}} style={{borderRadius:14,overflow:"hidden",marginBottom:8,border:`1.5px solid ${paid?C.greenBorder:"#e8e3d9"}`,display:"block",textDecoration:"none",cursor:paid?"default":"pointer"}}>
             <div style={{background:paid?"#edf7f1":"#1a7a4a",padding:"10px 14px",display:"flex",alignItems:"center",gap:8}}>
               <span style={{fontSize:14}}>{paid?"✓":"🔒"}</span>
               <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:700,color:paid?C.green:"#fff",letterSpacing:"0.08em",textTransform:"uppercase"}}>
-                {paid?"Direct contacts unlocked":"Unlock direct contacts"}
+                {paid?"Direct contacts unlocked":"Tap to unlock — $24.90"}
               </span>
+              {!paid&&<span style={{marginLeft:"auto",fontSize:11,color:"rgba(255,255,255,0.8)"}}>→</span>}
             </div>
             <div style={{background:paid?C.greenLight+"30":"#fff",padding:"14px"}}>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
                 <span style={{fontSize:16,flexShrink:0}}>📞</span>
                 {paid?(
-                  <><a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}}>{job.phone||"—"}</a>{job.phone&&<CopyBtn text={job.phone}/>}</>
+                  <><a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}} onClick={e=>e.stopPropagation()}>{job.phone||"—"}</a>{job.phone&&<CopyBtn text={job.phone}/>}</>
                 ):(
                   <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:700,color:"#1a1a18",flex:1,filter:"blur(4px)",userSelect:"none"}}>{job.phone||"+61 7 4153 xxxx"}</div>
                 )}
               </div>
-              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:paid&&(job.instagram||job.facebook)?10:0}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:paid&&(job.instagram||fbUrl)?10:0}}>
                 <span style={{fontSize:16,flexShrink:0}}>✉️</span>
                 {paid?(
-                  <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}}>{job.email||"—"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
+                  <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}} onClick={e=>e.stopPropagation()}>{job.email||"—"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
                 ):(
                   <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1a1a18",flex:1,filter:"blur(4px)",userSelect:"none"}}>{job.email||"hiring@employer.com.au"}</div>
                 )}
               </div>
               {paid&&job.instagram&&(
-                <a href={job.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#fdf2f8",border:"1px solid #f9a8d4",borderRadius:8,padding:"8px 10px",textDecoration:"none",marginBottom:8}}>
+                <a href={job.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#fdf2f8",border:"1px solid #f9a8d4",borderRadius:8,padding:"8px 10px",textDecoration:"none",marginBottom:8}} onClick={e=>e.stopPropagation()}>
                   <span dangerouslySetInnerHTML={{__html:INSTA_SVG}} style={{flexShrink:0,display:"flex"}}/>
                   <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#9d174d",fontWeight:700,flex:1}}>{igHandle}</span>
                   <span style={{fontSize:11,color:"#9d174d"}}>→</span>
                 </a>
               )}
-              {paid&&job.facebook&&(
-                <a href={job.facebook} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#eff6ff",border:"1px solid #93c5fd",borderRadius:8,padding:"8px 10px",textDecoration:"none"}}>
+              {paid&&fbUrl&&(
+                <a href={fbUrl} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#eff6ff",border:"1px solid #93c5fd",borderRadius:8,padding:"8px 10px",textDecoration:"none"}} onClick={e=>e.stopPropagation()}>
                   <span dangerouslySetInnerHTML={{__html:FB_SVG}} style={{flexShrink:0,display:"flex"}}/>
                   <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1d4ed8",fontWeight:700,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{fbLabel}</span>
                   <span style={{fontSize:11,color:"#1d4ed8"}}>→</span>
@@ -417,7 +420,7 @@ function EmployerModal({job, onClose, paid, onUnlock}){
                 </div>
               )}
             </div>
-          </div>
+          </a>
         </div>
         {/* Sticky CTA en bas — seulement non payé */}
         {!paid&&(
@@ -531,7 +534,6 @@ export default function JobFinder({onSwitchTab}){
     setSearch(val);
     if(!val||val.length<2){setSuggestions([]);setSearchMode("none");setCityCoords(null);setCityName("");return;}
     const lower=val.toLowerCase();
-    // Find matching cities
     const cityMatches=Object.keys(CITY_COORDS).filter(city=>
       city.toLowerCase().startsWith(lower)
     ).slice(0,6);
@@ -540,7 +542,7 @@ export default function JobFinder({onSwitchTab}){
       setSearchMode("city_suggest");
     } else {
       setSuggestions([]);
-      setSearchMode("employer");
+      setSearchMode("none");
       setCityCoords(null);
       setCityName("");
     }
@@ -570,11 +572,6 @@ export default function JobFinder({onSwitchTab}){
       }
     }
     if(stateF&&j.state!==stateF)return false;
-    if(searchMode==="employer"&&search){
-      const q=search.toLowerCase();
-      if(!j.name.toLowerCase().includes(q)&&!(j.city||"").toLowerCase().includes(q))return false;
-    }
-    // Filtre par distance si ville sélectionnée et radius > 0
     if(cityCoords&&distRadius>0){
       const c=CITY_COORDS[j.city];
       if(!c)return false;
@@ -582,7 +579,7 @@ export default function JobFinder({onSwitchTab}){
       if(d>distRadius)return false;
     }
     return true;
-  }),[sector,stateF,search,searchMode,showSavedOnly,saved,cityCoords,distRadius]);
+  }),[sector,stateF,showSavedOnly,saved,cityCoords,distRadius]);
 
   const sorted=useMemo(()=>{
     if(cityCoords){
@@ -665,13 +662,12 @@ export default function JobFinder({onSwitchTab}){
           <div style={{position:"relative"}}>
             <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:15,pointerEvents:"none"}}>
               {searchMode==="city"?"📍":"🔍"}
-            </span>
             <input
               ref={searchRef}
               className="jf-input"
               value={search}
               onChange={e=>handleSearchChange(e.target.value)}
-              placeholder="Search by city or employer…"
+              placeholder="Search by city…"
               style={{width:"100%",padding:"12px 36px 12px 38px",borderRadius:12,border:`1.5px solid ${searchMode==="city"?C.green:C.border}`,background:C.bgCard,fontSize:13,fontFamily:"'DM Sans',sans-serif",color:C.text,boxSizing:"border-box",transition:"border-color 0.2s"}}
             />
             {search&&<button onClick={clearSearch} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",fontSize:16,color:C.textFaint,cursor:"pointer"}}>✕</button>}

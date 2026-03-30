@@ -83,104 +83,56 @@ const FAQ_ITEMS = [
 ];
 
 function FAQ() {
-  const [openIndex, setOpenIndex] = useState(null);
-
-  const toggle = (key) => setOpenIndex(openIndex === key ? null : key);
+  const [isOpen, setIsOpen] = useState(false);
+  const [openQ, setOpenQ] = useState(null);
+  const allQuestions = FAQ_ITEMS.flatMap(cat => cat.questions.map(q => ({...q, cat: cat.category, icon: cat.icon})));
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto", padding: "0 20px 48px", fontFamily: "'DM Sans', sans-serif" }}>
-      <div style={{ textAlign: "center", marginBottom: 24, paddingTop: 8 }}>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: "#1a1a18", marginBottom: 6 }}>
-          Frequently asked questions
-        </div>
-        <div style={{ fontSize: 13, color: "#9a9488" }}>
-          Everything you need to know about VisaRun
-        </div>
-      </div>
-
-      {FAQ_ITEMS.map((cat) => (
-        <div key={cat.category} style={{ marginBottom: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-            <span style={{ fontSize: 14 }}>{cat.icon}</span>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#9a9488" }}>
-              {cat.category}
-            </span>
+      {/* Tiroir principal */}
+      <div style={{ background: "#ffffff", border: `1px solid ${isOpen ? "#b8e0c8" : "#e8e3d9"}`, borderRadius: 14, overflow: "hidden", transition: "border-color 0.2s" }}>
+        <button
+          onClick={() => setIsOpen(p => !p)}
+          style={{ width: "100%", padding: "16px 20px", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, textAlign: "left" }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 16 }}>❓</span>
+            <div>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, fontWeight: 700, color: "#1a1a18" }}>Frequently asked questions</div>
+              <div style={{ fontSize: 12, color: "#9a9488", marginTop: 2 }}>Everything you need to know about VisaRun</div>
+            </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {cat.questions.map((item, i) => {
-              const key = cat.category + i;
-              const isOpen = openIndex === key;
-              return (
-                <div
-                  key={key}
-                  style={{
-                    background: "#ffffff",
-                    border: `1px solid ${isOpen ? "#b8e0c8" : "#e8e3d9"}`,
-                    borderRadius: 12,
-                    overflow: "hidden",
-                    transition: "border-color 0.2s",
-                  }}
-                >
-                  <button
-                    onClick={() => toggle(key)}
-                    style={{
-                      width: "100%",
-                      padding: "14px 16px",
-                      background: "transparent",
-                      border: "none",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: 12,
-                      textAlign: "left",
-                    }}
-                  >
-                    <span style={{ fontSize: 14, fontWeight: 600, color: "#1a1a18", lineHeight: 1.4 }}>
-                      {item.q}
-                    </span>
-                    <span style={{
-                      fontSize: 18,
-                      color: isOpen ? "#1a7a4a" : "#9a9488",
-                      transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
-                      transition: "transform 0.2s, color 0.2s",
-                      flexShrink: 0,
-                      lineHeight: 1,
-                    }}>+</span>
-                  </button>
-                  {isOpen && (
-                    <div style={{
-                      padding: "0 16px 16px",
-                      fontSize: 13,
-                      color: "#5a5850",
-                      lineHeight: 1.7,
-                      borderTop: "1px solid #edf7f1",
-                      paddingTop: 12,
-                    }}>
-                      {item.a}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <span style={{ fontSize: 20, color: isOpen ? "#1a7a4a" : "#9a9488", transform: isOpen ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.2s, color 0.2s", flexShrink: 0, lineHeight: 1 }}>+</span>
+        </button>
+        {isOpen && (
+          <div style={{ borderTop: "1px solid #edf7f1", padding: "12px 16px 16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {allQuestions.map((item, i) => {
+                const open = openQ === i;
+                return (
+                  <div key={i} style={{ background: "#f5f3ee", borderRadius: 10, overflow: "hidden" }}>
+                    <button
+                      onClick={() => setOpenQ(open ? null : i)}
+                      style={{ width: "100%", padding: "11px 14px", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, textAlign: "left" }}
+                    >
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a18", lineHeight: 1.4 }}>{item.q}</span>
+                      <span style={{ fontSize: 16, color: open ? "#1a7a4a" : "#9a9488", transform: open ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.2s", flexShrink: 0 }}>+</span>
+                    </button>
+                    {open && (
+                      <div style={{ padding: "0 14px 12px", fontSize: 13, color: "#5a5850", lineHeight: 1.7 }}>{item.a}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ background: "#edf7f1", border: "1px solid #b8e0c8", borderRadius: 10, padding: "12px 16px", textAlign: "center", marginTop: 12 }}>
+              <span style={{ fontSize: 13, color: "#1a7a4a" }}>
+                Still have questions?{" "}
+                <a href="mailto:visarunpro@gmail.com" style={{ color: "#1a7a4a", fontWeight: 700, textDecoration: "none" }}>visarunpro@gmail.com</a>
+              </span>
+            </div>
           </div>
-        </div>
-      ))}
-
-      <div style={{
-        background: "#edf7f1",
-        border: "1px solid #b8e0c8",
-        borderRadius: 12,
-        padding: "14px 18px",
-        textAlign: "center",
-        marginTop: 8,
-      }}>
-        <span style={{ fontSize: 13, color: "#1a7a4a" }}>
-          Still have questions? Email us at{" "}
-          <a href="mailto:visarunpro@gmail.com" style={{ color: "#1a7a4a", fontWeight: 700, textDecoration: "none" }}>
-            visarunpro@gmail.com
-          </a>
-        </span>
+        )}
       </div>
     </div>
   );
@@ -253,9 +205,9 @@ export default function App() {
         position: "sticky",
         top: 0,
         zIndex: 100,
-        background: activeTab === "jobs" ? "#0d3d22" : "rgba(255,255,255,0.97)",
+        background: "rgba(255,255,255,0.97)",
         backdropFilter: "blur(12px)",
-        borderBottom: activeTab === "jobs" ? "1px solid rgba(255,255,255,0.1)" : `1px solid ${C.border}`,
+        borderBottom: `1px solid ${C.border}`,
         boxShadow: "0 1px 12px rgba(0,0,0,0.08)",
         transition: "background 0.3s",
       }}>
@@ -266,7 +218,6 @@ export default function App() {
         }}>
           {tabs.map(tab => {
             const active = activeTab === tab.id;
-            const isJobsTab = activeTab === "jobs";
             return (
               <button
                 key={tab.id}
@@ -297,7 +248,7 @@ export default function App() {
                   fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: "0.06em",
-                  color: active ? (isJobsTab ? "#fff" : C.green) : (isJobsTab ? "rgba(255,255,255,0.5)" : C.textFaint),
+                  color: active ? C.green : C.textFaint,
                   fontFamily: "'DM Sans',sans-serif",
                   transition: "color 0.2s",
                 }}>{tab.label.toUpperCase()}</span>
@@ -310,7 +261,7 @@ export default function App() {
                   transform: "translateX(-50%)",
                   width: active ? 36 : 0,
                   height: 2.5,
-                  background: activeTab === "jobs" ? "#fff" : C.green,
+                  background: C.green,
                   borderRadius: "2px 2px 0 0",
                   transition: "width 0.25s cubic-bezier(.34,1.56,.64,1)",
                 }}/>
