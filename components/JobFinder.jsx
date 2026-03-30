@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { JOB_DATA } from "../data/JOB_DATA_FINAL";
 
 const C = {
@@ -15,13 +15,13 @@ const FREE_LIMIT = 5;
 const PRICE = "$24.90 AUD";
 
 const SECTORS = ["All","Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry","Other"];
-const STATES  = ["QLD","WA","NSW","VIC","TAS","NT","SA","ACT"];
-const STATE_ORDER = {QLD:0,WA:1,NSW:2,VIC:3,TAS:4,NT:5,SA:6,ACT:7};
+const STATES  = ["QLD","WA","NSW","VIC","TAS","NT","SA"];
+const STATE_ORDER = {QLD:0,WA:1,NSW:2,VIC:3,TAS:4,NT:5,SA:6};
 
 const SECTOR_ICONS = {
-  All:"âœ¦", Farm:"ðŸŒ¾", Mine:"â›ï¸", Construction:"ðŸ—ï¸", Roadhouse:"ðŸ›£ï¸",
-  Solar:"â˜€ï¸", Fish:"ðŸŸ", Abattoir:"ðŸ¥©", Forestry:"ðŸŒ²",
-  Other:"ðŸ¢", Hostel:"ðŸ¨", Recruitment:"ðŸ‘¥",
+  All:"✦", Farm:"🌾", Mine:"⛏️", Construction:"🏗️", Roadhouse:"🛣️",
+  Solar:"☀️", Fish:"🐟", Abattoir:"🥩", Forestry:"🌲",
+  Other:"🏢", Hostel:"🏨", Recruitment:"👥",
 };
 
 const STATE_COLORS = {
@@ -215,7 +215,7 @@ function CopyBtn({text}){
   const handle=async(e)=>{e.preventDefault();e.stopPropagation();const ok=await copyToClipboard(text);setS(ok?"ok":"err");setTimeout(()=>setS("idle"),2000);};
   return(
     <button onClick={handle} title="Copy" style={{background:s==="ok"?C.greenLight:s==="err"?C.redBg:C.bgMuted,color:s==="ok"?C.green:s==="err"?C.red:C.textFaint,border:`1px solid ${C.border}`,borderRadius:6,width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:12,flexShrink:0,transition:"all 0.18s"}}>
-      {s==="ok"?"âœ“":s==="err"?"âœ—":"ðŸ“‹"}
+      {s==="ok"?"✓":s==="err"?"✗":"📋"}
     </button>
   );
 }
@@ -227,7 +227,7 @@ function EmailModal({onClose, onCheck, checking, error}){
     <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:300,background:"rgba(26,26,24,0.7)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"jfFadeIn 0.2s ease"}}>
       <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:24,width:"100%",maxWidth:380,boxShadow:"0 8px 40px rgba(0,0,0,0.14)",overflow:"hidden",animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
         <div style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",padding:"24px 24px 20px",textAlign:"center"}}>
-          <div style={{fontSize:40,marginBottom:8}}>ðŸ¦˜</div>
+          <div style={{fontSize:40,marginBottom:8}}>🦘</div>
           <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",marginBottom:4}}>Access your contacts</div>
           <div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>Enter the email you used to pay</div>
         </div>
@@ -247,7 +247,7 @@ function EmailModal({onClose, onCheck, checking, error}){
             disabled={checking||!email.includes("@")}
             style={{width:"100%",padding:"14px",borderRadius:12,border:"none",background:checking?"#9a9488":"#1a7a4a",color:"#fff",fontSize:14,fontWeight:700,cursor:checking?"not-allowed":"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:10}}
           >
-            {checking?"Checking...":"Unlock Access â†’"}
+            {checking?"Checking...":"Unlock Access →"}
           </button>
           <button onClick={onClose} style={{width:"100%",padding:"10px",borderRadius:10,border:"1px solid #e8e3d9",background:"transparent",color:"#5a5850",fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
             Cancel
@@ -264,18 +264,18 @@ function PaymentModal({onClose, onAlreadyPaid}){
     <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:300,background:"rgba(26,26,24,0.7)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,animation:"jfFadeIn 0.2s ease"}}>
       <div onClick={e=>e.stopPropagation()} style={{background:C.bgCard,borderRadius:24,width:"100%",maxWidth:400,boxShadow:C.shadowLg,overflow:"hidden",animation:"jfSlideUp 0.3s cubic-bezier(.34,1.56,.64,1)"}}>
         <div style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",padding:"28px 24px 22px",textAlign:"center"}}>
-          <div style={{fontSize:38,marginBottom:10}}>ðŸ¦˜</div>
+          <div style={{fontSize:38,marginBottom:10}}>🦘</div>
           <div style={{fontFamily:"'Playfair Display',serif",fontSize:21,fontWeight:700,color:"#fff",marginBottom:5,lineHeight:1.2}}>Skip the agencies.</div>
           <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#fff",marginBottom:8,lineHeight:1.2}}>Contact employers yourself.</div>
-          <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:"rgba(255,255,255,0.75)"}}>Find work anywhere in Australia â€” no middleman.</div>
+          <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:"rgba(255,255,255,0.75)"}}>Find work anywhere in Australia — no middleman.</div>
         </div>
         <div style={{padding:"18px 20px 22px"}}>
           <div style={{background:C.greenLight,border:`1px solid ${C.greenBorder}`,borderRadius:8,padding:"9px 13px",marginBottom:14,display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:14}}>ðŸ“</span>
+            <span style={{fontSize:14}}>📍</span>
             <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.green,fontWeight:600}}>Jobs available now across all 7 states</span>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:14}}>
-            {[["ðŸ“ž","Direct phone"],["âœ‰ï¸","Recruitment email"],["ðŸŒ","Official website"],["ðŸ“¸","Instagram"],["ðŸ‘¥","Facebook"],["ðŸ“","Sort by distance"]].map(([icon,label])=>(
+            {[["📞","Direct phone"],["✉️","Recruitment email"],["🌐","Official website"],["📸","Instagram"],["👥","Facebook"],["📍","Sort by distance"]].map(([icon,label])=>(
               <div key={label} style={{background:C.bgMuted,borderRadius:8,padding:"9px 11px",display:"flex",alignItems:"center",gap:7}}>
                 <span style={{fontSize:14}}>{icon}</span>
                 <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,color:C.text}}>{label}</span>
@@ -284,21 +284,21 @@ function PaymentModal({onClose, onAlreadyPaid}){
           </div>
           <div style={{textAlign:"center",marginBottom:6}}>
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:40,fontWeight:700,color:C.green,lineHeight:1}}>{PRICE}</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginTop:4}}>One-time Â· No subscription Â· Lifetime access</div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginTop:4}}>One-time · No subscription · Lifetime access</div>
           </div>
           <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,textAlign:"center",marginBottom:14}}>
-            Updated contacts Â· Not random Google results
+            Updated contacts · Not random Google results
           </div>
           <a href={STRIPE_URL} target="_blank" rel="noopener noreferrer" style={{display:"block",width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textAlign:"center",textDecoration:"none",boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
-            ðŸ”“ Unlock 2,000+ employer contacts â€” {PRICE}
+            🔓 Unlock 2,000+ employer contacts — {PRICE}
           </a>
           <div style={{display:"flex",justifyContent:"center",gap:14,marginBottom:14}}>
-            {["ðŸ” Secure","âš¡ Instant access","âœ… Lifetime"].map(t=>(
+            {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
               <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
             ))}
           </div>
           <button onClick={onAlreadyPaid} style={{width:"100%",padding:"12px",borderRadius:10,border:`1.5px solid ${C.green}`,background:C.greenLight,color:C.green,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:8}}>
-            âœ“ Already paid? Click here to unlock
+            ✓ Already paid? Click here to unlock
           </button>
           <button onClick={onClose} style={{width:"100%",padding:"10px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
             Close
@@ -320,7 +320,7 @@ function EmployerModal({job, onClose, paid, onUnlock}){
   const fbIsNumeric=job.facebook&&/\/\d+\/?$/.test(job.facebook);
   const fbIsProfile=job.facebook&&/profil\.php|profile\.php/i.test(job.facebook);
   const fbUrl=(fbIsNumeric||fbIsProfile)?null:job.facebook;
-  const fbLabel=fbUrl?fbUrl.replace(/https?:\/\/(www\.)?facebook\.com\//,"").replace(/\/$/,""):`${job.name} Â· Facebook`;
+  const fbLabel=fbUrl?fbUrl.replace(/https?:\/\/(www\.)?facebook\.com\//,"").replace(/\/$/,""):`${job.name} · Facebook`;
   const INSTA_SVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#9d174d" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#9d174d" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="#9d174d"/></svg>`;
   const FB_SVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="#1d4ed8" xmlns="http://www.w3.org/2000/svg"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>`;
   return(
@@ -330,7 +330,7 @@ function EmployerModal({job, onClose, paid, onUnlock}){
         <div style={{borderBottom:`1px solid ${C.border}`,padding:"20px 20px 16px",flexShrink:0,background:C.bgCard,borderRadius:"20px 20px 0 0"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
             <div style={{width:48,height:48,borderRadius:12,background:C.bgMuted,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0,border:`1px solid ${C.border}`}}>
-              {SECTOR_ICONS[job.sector]||"ðŸ¢"}
+              {SECTOR_ICONS[job.sector]||"🏢"}
             </div>
             <div style={{flex:1,minWidth:0}}>
               <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
@@ -342,7 +342,7 @@ function EmployerModal({job, onClose, paid, onUnlock}){
                 <span style={{background:sc+"22",border:`1px solid ${sc}55`,borderRadius:6,padding:"2px 7px",fontSize:11,fontWeight:700,color:sc}}>{job.state}</span>
               </div>
             </div>
-            <button onClick={onClose} style={{background:"transparent",border:"none",fontSize:22,cursor:"pointer",color:C.textFaint,padding:4,flexShrink:0,lineHeight:1}}>âœ•</button>
+            <button onClick={onClose} style={{background:"transparent",border:"none",fontSize:22,cursor:"pointer",color:C.textFaint,padding:4,flexShrink:0,lineHeight:1}}>✕</button>
           </div>
         </div>
         {/* Contenu scrollable */}
@@ -350,10 +350,10 @@ function EmployerModal({job, onClose, paid, onUnlock}){
           <div style={{background:C.bgMuted,borderRadius:10,padding:"12px 14px",marginBottom:12}}>
             <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.textFaint,letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,marginBottom:6}}>Location</div>
             <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
-              <span style={{fontSize:16,marginTop:1}}>ðŸ“</span>
+              <span style={{fontSize:16,marginTop:1}}>📍</span>
               <div>
                 <a href={`https://maps.google.com/?q=${encodeURIComponent((job.address?job.address+", ":"")+(job.city?job.city+", ":"")+job.state+", Australia")}`} target="_blank" rel="noopener noreferrer" style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:600,color:C.green,textDecoration:"none",display:"block"}}>
-                  {job.city||job.state} â†’ View on Google Maps
+                  {job.city||job.state} → View on Google Maps
                 </a>
                 {job.address&&<div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginTop:2}}>{job.address}</div>}
               </div>
@@ -361,32 +361,32 @@ function EmployerModal({job, onClose, paid, onUnlock}){
           </div>
           {job.website&&(
             <a href={job.website} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10,background:C.greenLight,border:`1px solid ${C.greenBorder}`,borderRadius:10,padding:"11px 14px",textDecoration:"none",marginBottom:12}}>
-              <span style={{fontSize:16}}>ðŸŒ</span>
+              <span style={{fontSize:16}}>🌐</span>
               <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.green,fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.website.replace(/https?:\/\/(www\.)?/,"")}</span>
-              <span style={{fontSize:12,color:C.green,flexShrink:0}}>â†’</span>
+              <span style={{fontSize:12,color:C.green,flexShrink:0}}>→</span>
             </a>
           )}
           <a href={paid?"#":"https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00"} target={paid?"_self":"_blank"} rel="noopener noreferrer" onClick={e=>{if(paid)e.preventDefault();}} style={{borderRadius:14,overflow:"hidden",marginBottom:8,border:`1.5px solid ${paid?C.greenBorder:"#e8e3d9"}`,display:"block",textDecoration:"none",cursor:paid?"default":"pointer"}}>
             <div style={{background:paid?"#edf7f1":"#1a7a4a",padding:"10px 14px",display:"flex",alignItems:"center",gap:8}}>
-              <span style={{fontSize:14}}>{paid?"âœ“":"ðŸ”’"}</span>
+              <span style={{fontSize:14}}>{paid?"✓":"🔒"}</span>
               <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:700,color:paid?C.green:"#fff",letterSpacing:"0.08em",textTransform:"uppercase"}}>
-                {paid?"Direct contacts unlocked":"Tap to unlock â€” $24.90"}
+                {paid?"Direct contacts unlocked":"Tap to unlock — $24.90"}
               </span>
-              {!paid&&<span style={{marginLeft:"auto",fontSize:11,color:"rgba(255,255,255,0.8)"}}>â†’</span>}
+              {!paid&&<span style={{marginLeft:"auto",fontSize:11,color:"rgba(255,255,255,0.8)"}}>→</span>}
             </div>
             <div style={{background:paid?C.greenLight+"30":"#fff",padding:"14px"}}>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-                <span style={{fontSize:16,flexShrink:0}}>ðŸ“ž</span>
+                <span style={{fontSize:16,flexShrink:0}}>📞</span>
                 {paid?(
-                  <><a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}} onClick={e=>e.stopPropagation()}>{job.phone||"â€”"}</a>{job.phone&&<CopyBtn text={job.phone}/>}</>
+                  <><a href={`tel:${(job.phone||"").replace(/\s/g,"")}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.green,fontWeight:700,flex:1,textDecoration:"none"}} onClick={e=>e.stopPropagation()}>{job.phone||"—"}</a>{job.phone&&<CopyBtn text={job.phone}/>}</>
                 ):(
                   <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:700,color:"#1a1a18",flex:1,filter:"blur(4px)",userSelect:"none"}}>{job.phone||"+61 7 4153 xxxx"}</div>
                 )}
               </div>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:paid&&(job.instagram||fbUrl)?10:0}}>
-                <span style={{fontSize:16,flexShrink:0}}>âœ‰ï¸</span>
+                <span style={{fontSize:16,flexShrink:0}}>✉️</span>
                 {paid?(
-                  <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}} onClick={e=>e.stopPropagation()}>{job.email||"â€”"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
+                  <><a href={`mailto:${job.email}`} style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textMid,flex:1,textDecoration:"none",wordBreak:"break-all"}} onClick={e=>e.stopPropagation()}>{job.email||"—"}</a>{job.email&&<CopyBtn text={job.email}/>}</>
                 ):(
                   <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1a1a18",flex:1,filter:"blur(4px)",userSelect:"none"}}>{job.email||"hiring@employer.com.au"}</div>
                 )}
@@ -395,22 +395,22 @@ function EmployerModal({job, onClose, paid, onUnlock}){
                 <a href={job.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#fdf2f8",border:"1px solid #f9a8d4",borderRadius:8,padding:"8px 10px",textDecoration:"none",marginBottom:8}} onClick={e=>e.stopPropagation()}>
                   <span dangerouslySetInnerHTML={{__html:INSTA_SVG}} style={{flexShrink:0,display:"flex"}}/>
                   <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#9d174d",fontWeight:700,flex:1}}>{igHandle}</span>
-                  <span style={{fontSize:11,color:"#9d174d"}}>â†’</span>
+                  <span style={{fontSize:11,color:"#9d174d"}}>→</span>
                 </a>
               )}
               {paid&&fbUrl&&(
                 <a href={fbUrl} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,background:"#eff6ff",border:"1px solid #93c5fd",borderRadius:8,padding:"8px 10px",textDecoration:"none"}} onClick={e=>e.stopPropagation()}>
                   <span dangerouslySetInnerHTML={{__html:FB_SVG}} style={{flexShrink:0,display:"flex"}}/>
                   <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"#1d4ed8",fontWeight:700,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{fbLabel}</span>
-                  <span style={{fontSize:11,color:"#1d4ed8"}}>â†’</span>
+                  <span style={{fontSize:11,color:"#1d4ed8"}}>→</span>
                 </a>
               )}
               {!paid&&(
                 <div style={{display:"flex",gap:6,marginTop:4}}>
-                  {[[INSTA_SVG,"#fdf2f8","#9d174d","Instagram"],[FB_SVG,"#eff6ff","#1d4ed8","Facebook"],["ðŸ“","#f5f3ee","#9a9488","By distance"]].map(([icon,bg,color,label])=>(
+                  {[[INSTA_SVG,"#fdf2f8","#9d174d","Instagram"],[FB_SVG,"#eff6ff","#1d4ed8","Facebook"],["📍","#f5f3ee","#9a9488","By distance"]].map(([icon,bg,color,label])=>(
                     <div key={label} style={{flex:1,background:bg,borderRadius:8,padding:"7px 4px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
                       {label==="By distance"
-                        ?<span style={{fontSize:15}}>ðŸ“</span>
+                        ?<span style={{fontSize:15}}>📍</span>
                         :<span dangerouslySetInnerHTML={{__html:icon}} style={{display:"flex"}}/>
                       }
                       <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color,fontWeight:700}}>{label}</div>
@@ -421,14 +421,14 @@ function EmployerModal({job, onClose, paid, onUnlock}){
             </div>
           </a>
         </div>
-        {/* Sticky CTA en bas â€” seulement non payÃ© */}
+        {/* Sticky CTA en bas — seulement non payé */}
         {!paid&&(
           <div style={{padding:"12px 20px 24px",flexShrink:0,borderTop:`1px solid ${C.border}`,background:C.bgCard}}>
             <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{display:"flex",width:"100%",padding:"16px",borderRadius:13,background:"#1a7a4a",color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:8,textDecoration:"none",boxSizing:"border-box"}}>
-              ðŸ”“ Unlock all contacts â€” {PRICE}
+              🔓 Unlock all contacts — {PRICE}
             </a>
             <div style={{display:"flex",justifyContent:"center",gap:16}}>
-              {["ðŸ” Secure","âš¡ Instant","âœ… Lifetime"].map(t=>(
+              {["🔐 Secure","⚡ Instant","✅ Lifetime"].map(t=>(
                 <span key={t} style={{fontSize:10,color:C.textFaint,fontFamily:"'DM Sans',sans-serif"}}>{t}</span>
               ))}
             </div>
@@ -453,44 +453,14 @@ export default function JobFinder({onSwitchTab}){
   const[saved,setSaved]=useState([]);
   const[searchMode,setSearchMode]=useState("none");
   const[showEmailModal,setShowEmailModal]=useState(false);
+  const[emailInput,setEmailInput]=useState("");
   const[emailChecking,setEmailChecking]=useState(false);
   const[emailError,setEmailError]=useState("");
   const[distRadius,setDistRadius]=useState(0);
   const savedHydrated=useRef(false);
   const searchRef=useRef();
 
-  const verifyPaidEmail=useCallback(async(email,{silent=false}={})=>{
-    const normalized=email.toLowerCase().trim();
-    setEmailChecking(true);
-    if(!silent)setEmailError("");
-    try{
-      const res=await fetch("/api/check-access",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({email:normalized})
-      });
-      if(!res.ok)throw new Error("Access check failed");
-      const data=await res.json();
-      if(data.paid){
-        localStorage.setItem("vr_paid_email",normalized);
-        setPaid(true);
-        if(!silent)setShowEmailModal(false);
-      } else {
-        localStorage.removeItem("vr_paid_email");
-        setPaid(false);
-        if(!silent){
-          setShowEmailModal(false);
-          setShowPayment(true);
-        }
-      }
-    }catch{
-      if(!silent)setEmailError("Connection error. Please try again.");
-    }finally{
-      setEmailChecking(false);
-    }
-  },[]);
-
-  // Load saved jobs + re-check paid status client-side only
+  // Load saved jobs + check paid status client-side only
   useEffect(()=>{
     try{
       const s=localStorage.getItem("vr_saved_jobs");
@@ -499,13 +469,11 @@ export default function JobFinder({onSwitchTab}){
     savedHydrated.current=true;
     try{
       const storedEmail=localStorage.getItem("vr_paid_email");
-      if(storedEmail){
-        verifyPaidEmail(storedEmail,{silent:true});
-      }
+      if(storedEmail)setPaid(true);
     }catch{}
-  },[verifyPaidEmail]);
+  },[]);
 
-  // Save favoris â€” seulement apres hydratation
+  // Save favoris — seulement apres hydratation
   useEffect(()=>{
     if(!savedHydrated.current)return;
     try{localStorage.setItem("vr_saved_jobs",JSON.stringify(saved));}catch{}
@@ -516,7 +484,31 @@ export default function JobFinder({onSwitchTab}){
     setSaved(prev=>prev.includes(jobName)?prev.filter(n=>n!==jobName):[...prev,jobName]);
   },[]);
 
-  const checkEmail=useCallback((email)=>verifyPaidEmail(email),[verifyPaidEmail]);
+  // Verifier l email contre Supabase via notre API
+  const checkEmail=useCallback(async(email)=>{
+    setEmailChecking(true);
+    setEmailError("");
+    try{
+      const res=await fetch("/api/check-access",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({email:email.toLowerCase().trim()})
+      });
+      const data=await res.json();
+      if(data.paid){
+        localStorage.setItem("vr_paid_email",email.toLowerCase().trim());
+        setPaid(true);
+        setShowEmailModal(false);
+      } else {
+        setShowEmailModal(false);
+        setShowPayment(true);
+      }
+    }catch{
+      setEmailError("Connection error. Please try again.");
+    }finally{
+      setEmailChecking(false);
+    }
+  },[]);
 
   useEffect(()=>{
     const s=document.createElement("style");s.id="jf-styles";
@@ -637,7 +629,7 @@ export default function JobFinder({onSwitchTab}){
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
           <div>
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>Find employers directly.</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginTop:3}}>2,000+ contacts Â· No middleman Â· No agency fees</div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginTop:3}}>2,000+ contacts · No middleman · No agency fees</div>
           </div>
           {!paid?(
             <div style={{display:"flex",gap:6,flexShrink:0}}>
@@ -645,19 +637,19 @@ export default function JobFinder({onSwitchTab}){
                 Sign in
               </button>
               <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{background:"#fff",borderRadius:10,padding:"8px 12px",color:C.green,fontSize:11,fontWeight:700,textDecoration:"none",display:"flex",alignItems:"center",gap:4,whiteSpace:"nowrap"}}>
-                ðŸ”“ {PRICE}
+                🔓 {PRICE}
               </a>
             </div>
           ):(
-            <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>âœ“ Full access</div>
+            <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>✓ Full access</div>
           )}
         </div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           {[
-            ["ðŸ“ž","Direct phone"],
-            ["âœ‰ï¸","Email"],
-            ["ðŸ“¸","Instagram"],
-            ["ðŸ‘¥","Facebook"],
+            ["📞","Direct phone"],
+            ["✉️","Email"],
+            ["📸","Instagram"],
+            ["👥","Facebook"],
           ].map(([icon,label])=>(
             <div key={label} style={{display:"flex",alignItems:"center",gap:5,background:"rgba(255,255,255,0.12)",borderRadius:8,padding:"5px 10px",border:"1px solid rgba(255,255,255,0.15)"}}>
               <span style={{fontSize:12}}>{icon}</span>
@@ -673,24 +665,24 @@ export default function JobFinder({onSwitchTab}){
         <div style={{marginBottom:12,position:"relative"}}>
           <div style={{position:"relative"}}>
             <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:15,pointerEvents:"none"}}>
-              {searchMode==="city"?"ðŸ“":"ðŸ”"}
+              {searchMode==="city"?"📍":"🔍"}
             </span>
             <input
               ref={searchRef}
               className="jf-input"
               value={search}
               onChange={e=>handleSearchChange(e.target.value)}
-              placeholder="Search by cityâ€¦"
+              placeholder="Search by city…"
               style={{width:"100%",padding:"12px 36px 12px 38px",borderRadius:12,border:`1.5px solid ${searchMode==="city"?C.green:C.border}`,background:C.bgCard,fontSize:13,fontFamily:"'DM Sans',sans-serif",color:C.text,boxSizing:"border-box",transition:"border-color 0.2s"}}
             />
-            {search&&<button onClick={clearSearch} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",fontSize:16,color:C.textFaint,cursor:"pointer"}}>âœ•</button>}
+            {search&&<button onClick={clearSearch} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",fontSize:16,color:C.textFaint,cursor:"pointer"}}>✕</button>}
           </div>
           {suggestions.length>0&&(
             <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:12,boxShadow:C.shadowLg,zIndex:50,overflow:"hidden"}}>
               <div style={{padding:"8px 12px 4px",fontSize:9,color:C.textFaint,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600}}>Cities nearby</div>
               {suggestions.map(city=>(
                 <div key={city} onClick={()=>selectCity(city)} style={{padding:"10px 14px",fontSize:13,color:C.text,cursor:"pointer",display:"flex",alignItems:"center",gap:8,borderTop:`1px solid ${C.border}`}} onMouseEnter={e=>e.currentTarget.style.background=C.bgMuted} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                  <span style={{fontSize:13}}>ðŸ“</span>
+                  <span style={{fontSize:13}}>📍</span>
                   <span style={{fontWeight:500}}>{city}</span>
                 </div>
               ))}
@@ -702,7 +694,7 @@ export default function JobFinder({onSwitchTab}){
             <div style={{marginTop:8,background:C.bgCard,border:`1px solid ${C.greenBorder}`,borderRadius:10,padding:"10px 14px"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
                 <div style={{fontSize:11,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
-                  <span>ðŸ“</span> {cityName}
+                  <span>📍</span> {cityName}
                 </div>
                 <span style={{fontSize:11,color:C.green,fontWeight:700}}>{distRadius===0?"Any distance":`Within ${distRadius}km`}</span>
               </div>
@@ -736,7 +728,7 @@ export default function JobFinder({onSwitchTab}){
             })}
             {saved.length>0&&(
               <button className="jf-chip" onClick={()=>{setSector(null);setShowSavedOnly(p=>!p);}} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${showSavedOnly?"#f59e0b":C.border}`,background:showSavedOnly?"#fef9ec":C.bgCard,color:showSavedOnly?"#b45309":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
-                â­ Saved <span style={{background:showSavedOnly?"#f59e0b":"#e2e8f0",color:showSavedOnly?"#fff":"#64748b",borderRadius:20,padding:"1px 7px",fontSize:11,fontWeight:700}}>{saved.length}</span>
+                ⭐ Saved <span style={{background:showSavedOnly?"#f59e0b":"#e2e8f0",color:showSavedOnly?"#fff":"#64748b",borderRadius:20,padding:"1px 7px",fontSize:11,fontWeight:700}}>{saved.length}</span>
               </button>
             )}
           </div>
@@ -754,28 +746,28 @@ export default function JobFinder({onSwitchTab}){
 
         {/* Count + Saved toggle */}
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,background:C.bgMuted,borderRadius:10,padding:"10px 14px"}}>
-          <span style={{fontSize:13}}>ðŸ“‹</span>
+          <span style={{fontSize:13}}>📋</span>
           <span style={{fontSize:13,fontWeight:600,color:C.text}}>
             <span style={{color:C.green,fontFamily:"'Playfair Display',serif",fontSize:18}}>{sorted.length}</span>
             {" "}employer{sorted.length!==1?"s":""} found
           </span>
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6}}>
             {!paid&&sorted.length>FREE_LIMIT&&!showSavedOnly&&(
-              <span style={{fontSize:10,color:C.textFaint}}>{FREE_LIMIT} free Â· {lockedCount} locked</span>
+              <span style={{fontSize:10,color:C.textFaint}}>{FREE_LIMIT} free · {lockedCount} locked</span>
             )}
-            {paid&&cityCoords&&!showSavedOnly&&<span style={{fontSize:10,color:C.green,fontWeight:600}}>ðŸ“ By proximity</span>}
+            {paid&&cityCoords&&!showSavedOnly&&<span style={{fontSize:10,color:C.green,fontWeight:600}}>📍 By proximity</span>}
           </div>
         </div>
 
         {/* Zero results */}
         {sorted.length===0&&(
           <div style={{textAlign:"center",padding:"40px 0"}}>
-            <div style={{fontSize:40,marginBottom:12}}>ðŸ”</div>
+            <div style={{fontSize:40,marginBottom:12}}>🔍</div>
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:C.text,marginBottom:8}}>No results found</div>
             <div style={{fontSize:13,color:C.textFaint,marginBottom:16}}>Try removing a filter</div>
             <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
-              {sector&&<button onClick={()=>setSector(null)} style={{padding:"8px 14px",borderRadius:9,border:`1.5px solid ${C.green}`,background:C.greenLight,color:C.green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>âœ• Remove "{sector}"</button>}
-              {stateF&&<button onClick={()=>setStateF(null)} style={{padding:"8px 14px",borderRadius:9,border:`1.5px solid ${C.green}`,background:C.greenLight,color:C.green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>âœ• Remove "{stateF}"</button>}
+              {sector&&<button onClick={()=>setSector(null)} style={{padding:"8px 14px",borderRadius:9,border:`1.5px solid ${C.green}`,background:C.greenLight,color:C.green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>✕ Remove "{sector}"</button>}
+              {stateF&&<button onClick={()=>setStateF(null)} style={{padding:"8px 14px",borderRadius:9,border:`1.5px solid ${C.green}`,background:C.greenLight,color:C.green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>✕ Remove "{stateF}"</button>}
             </div>
           </div>
         )}
@@ -794,7 +786,7 @@ export default function JobFinder({onSwitchTab}){
                     {/* Top row */}
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
                       <div style={{width:40,height:40,borderRadius:10,background:C.bgMuted,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>
-                        {SECTOR_ICONS[job.sector]||"ðŸ¢"}
+                        {SECTOR_ICONS[job.sector]||"🏢"}
                       </div>
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2,flexWrap:"wrap"}}>
@@ -804,14 +796,14 @@ export default function JobFinder({onSwitchTab}){
                         <div style={{display:"flex",alignItems:"center",gap:6}}>
                           <span style={{fontSize:11,color:C.teal,fontWeight:600}}>{job.sector}</span>
                           {job.score>0&&(
-                            <span style={{fontSize:10,color:"#f59e0b",fontWeight:600}}>â˜… {job.score}{job.reviews>0&&<span style={{color:C.textFaint,fontWeight:400}}> ({job.reviews})</span>}</span>
+                            <span style={{fontSize:10,color:"#f59e0b",fontWeight:600}}>★ {job.score}{job.reviews>0&&<span style={{color:C.textFaint,fontWeight:400}}> ({job.reviews})</span>}</span>
                           )}
                         </div>
                       </div>
                       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4,flexShrink:0}}>
                         <div style={{display:"flex",alignItems:"center",gap:6}}>
                           <button onClick={(e)=>toggleSave(job.name,e)} style={{background:saved.includes(job.name)?"#fef9ec":"transparent",border:`1.5px solid ${saved.includes(job.name)?"#f59e0b":C.border}`,borderRadius:8,cursor:"pointer",fontSize:20,padding:"4px 8px",lineHeight:1,color:saved.includes(job.name)?"#f59e0b":C.textFaint,transition:"all 0.2s"}} title={saved.includes(job.name)?"Remove from saved":"Save"}>
-                            {saved.includes(job.name)?"â­":"â˜†"}
+                            {saved.includes(job.name)?"⭐":"☆"}
                           </button>
                           <span style={{background:sc+"22",border:`1px solid ${sc}55`,borderRadius:7,padding:"3px 8px",fontSize:11,fontWeight:700,color:sc}}>{job.state}</span>
                         </div>
@@ -820,9 +812,9 @@ export default function JobFinder({onSwitchTab}){
                     </div>
                     {/* Location row */}
                     <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgMuted,borderRadius:8,padding:"6px 10px",marginBottom:6}}>
-                      <span style={{fontSize:11}}>ðŸ“</span>
-                      <span style={{fontSize:11,fontWeight:500,color:C.textMid,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.city||job.state}{job.address?` Â· ${job.address}`:""}</span>
-                      <a href={`https://maps.google.com/?q=${encodeURIComponent((job.city||job.state)+", Australia")}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:10,color:C.teal,fontWeight:600,textDecoration:"none",flexShrink:0}}>Map â†’</a>
+                      <span style={{fontSize:11}}>📍</span>
+                      <span style={{fontSize:11,fontWeight:500,color:C.textMid,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.city||job.state}{job.address?` · ${job.address}`:""}</span>
+                      <a href={`https://maps.google.com/?q=${encodeURIComponent((job.city||job.state)+", Australia")}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:10,color:C.teal,fontWeight:600,textDecoration:"none",flexShrink:0}}>Map →</a>
                     </div>
                     {/* Contact badges */}
                     <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
@@ -847,9 +839,9 @@ export default function JobFinder({onSwitchTab}){
             {/* Paywall */}
             {showWall&&(
               <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{display:"block",marginTop:12,background:C.bgCard,border:`1.5px solid ${C.greenBorder}`,borderRadius:18,padding:"20px",textAlign:"center",textDecoration:"none",cursor:"pointer"}}>
-                <div style={{fontSize:24,marginBottom:8}}>ðŸ”’</div>
+                <div style={{fontSize:24,marginBottom:8}}>🔒</div>
                 <div style={{fontFamily:"'Playfair Display',serif",fontSize:19,fontWeight:700,color:C.text,marginBottom:4}}>2,000+ direct employer contacts</div>
-                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:14,lineHeight:1.6}}>Updated contacts Â· Not random Google results</div>
+                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:14,lineHeight:1.6}}>Updated contacts · Not random Google results</div>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,marginBottom:12}}>
                   {[["2,000+","employers"],["7","states"],["$24.90","one-time"]].map(([n,l])=>(
                     <div key={l} style={{background:C.bgMuted,borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
@@ -858,12 +850,12 @@ export default function JobFinder({onSwitchTab}){
                     </div>
                   ))}
                 </div>
-                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginBottom:10}}>âœ… Lifetime access Â· One-time payment Â· No subscription</div>
+                <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginBottom:10}}>✅ Lifetime access · One-time payment · No subscription</div>
                 <div style={{width:"100%",padding:"15px",borderRadius:13,background:C.green,color:"#fff",fontSize:15,fontWeight:700,fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
-                  ðŸ”“ Unlock 2,000+ employer contacts â€” {PRICE}
+                  🔓 Unlock 2,000+ employer contacts — {PRICE}
                 </div>
                 <div style={{display:"flex",justifyContent:"center",gap:14}}>
-                  {["ðŸ” Secure","âš¡ Instant access","âœ… Lifetime"].map(t=>(
+                  {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
                     <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
                   ))}
                 </div>
@@ -873,7 +865,7 @@ export default function JobFinder({onSwitchTab}){
             {paid&&(
               <div style={{textAlign:"center",padding:"20px 0"}}>
                 <div style={{fontFamily:"'Playfair Display',serif",fontSize:14,fontStyle:"italic",color:C.green}}>
-                  ðŸŽ‰ {sorted.length} employers unlocked â€” good luck!
+                  🎉 {sorted.length} employers unlocked — good luck!
                 </div>
               </div>
             )}
@@ -883,4 +875,3 @@ export default function JobFinder({onSwitchTab}){
     </div>
   );
 }
-
