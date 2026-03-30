@@ -221,7 +221,7 @@ export default function App() {
             return (
               <button
                 key={tab.id}
-                onClick={() => { setActiveTab(tab.id); window.scrollTo({top:0,behavior:"smooth"}); }}
+                onClick={() => { setActiveTab(tab.id); setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),0); }}
                 style={{
                   flex: 1,
                   padding: "13px 0 11px",

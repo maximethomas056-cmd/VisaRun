@@ -566,7 +566,7 @@ function Toast({msg,ok}){
 
 function FindWorkBanner({onSwitchTab}){
   return(
-    <div onClick={()=>{onSwitchTab("jobs");window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 4px 16px rgba(26,122,74,0.25)",marginTop:12}}>
+    <div onClick={()=>{onSwitchTab("jobs");setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),0);}} style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 4px 16px rgba(26,122,74,0.25)",marginTop:12}}>
       <div style={{fontSize:26}}>🔍</div>
       <div style={{flex:1}}>
         <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"#fff",marginBottom:2}}>Find your employer directly</div>
@@ -655,7 +655,7 @@ export default function VisaRunApp({onSwitchTab}){
             : {gross:0,net:0,tax:0,super:0,abn:"",name:"Employee",employer:"",date:"",hoursWorked:0,periodDays:0,farmDays:0,valid:false};
         }
         setScanning(draft);
-        await new Promise(r=>setTimeout(r,1800));
+        await new Promise(r=>setTimeout(r,800));
         setScanning(null);
         setModal({draft,filename:file.name,editMode:false});
         await new Promise(r=>{resolver.current=r;});
@@ -687,7 +687,7 @@ export default function VisaRunApp({onSwitchTab}){
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
           {streak>0&&<div style={{background:C.amberBg,border:"1px solid #fde68a",borderRadius:8,padding:"5px 10px",fontSize:11,color:C.amber,fontWeight:700,display:"flex",alignItems:"center",gap:4}}><span>🔥</span>{streak}w</div>}
-          {onSwitchTab&&<button onClick={()=>{onSwitchTab("jobs");window.scrollTo({top:0,behavior:"smooth"});}} style={{background:C.green,border:"none",borderRadius:9,padding:"7px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap"}}>Find Work →</button>}
+          {onSwitchTab&&<button onClick={()=>{onSwitchTab("jobs");setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),0);}} style={{background:C.green,border:"none",borderRadius:9,padding:"7px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap"}}>Find Work →</button>}
         </div>
       </div>
 
