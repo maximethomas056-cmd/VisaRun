@@ -339,7 +339,6 @@ function EmployerModal({job, onClose, paid, onUnlock}){
               </div>
               <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
                 <span style={{fontSize:11,color:C.teal,fontWeight:600}}>{job.sector}</span>
-                <span style={{fontSize:11,color:C.textFaint}}>· 88-day eligible</span>
                 <span style={{background:sc+"22",border:`1px solid ${sc}55`,borderRadius:6,padding:"2px 7px",fontSize:11,fontWeight:700,color:sc}}>{job.state}</span>
               </div>
             </div>
@@ -633,9 +632,14 @@ export default function JobFinder({onSwitchTab}){
             <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginTop:3}}>2,000+ contacts · No middleman · No agency fees</div>
           </div>
           {!paid?(
-            <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" className="jf-cta" style={{background:"#fff",borderRadius:10,padding:"8px 14px",color:C.green,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.2s",flexShrink:0,textDecoration:"none",display:"flex",alignItems:"center",gap:5}}>
-              🔓 {PRICE}
-            </a>
+            <div style={{display:"flex",gap:6,flexShrink:0}}>
+              <button onClick={()=>setShowEmailModal(true)} style={{background:"rgba(255,255,255,0.15)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:10,padding:"8px 12px",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap"}}>
+                Sign in
+              </button>
+              <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{background:"#fff",borderRadius:10,padding:"8px 12px",color:C.green,fontSize:11,fontWeight:700,textDecoration:"none",display:"flex",alignItems:"center",gap:4,whiteSpace:"nowrap"}}>
+                🔓 {PRICE}
+              </a>
+            </div>
           ):(
             <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>✓ Full access</div>
           )}

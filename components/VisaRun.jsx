@@ -566,7 +566,7 @@ function Toast({msg,ok}){
 
 function FindWorkBanner({onSwitchTab}){
   return(
-    <div onClick={()=>onSwitchTab("jobs")} style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 4px 16px rgba(26,122,74,0.25)",marginTop:12}}>
+    <div onClick={()=>{onSwitchTab("jobs");window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 4px 16px rgba(26,122,74,0.25)",marginTop:12}}>
       <div style={{fontSize:26}}>🔍</div>
       <div style={{flex:1}}>
         <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"#fff",marginBottom:2}}>Find your employer directly</div>
@@ -679,15 +679,15 @@ export default function VisaRunApp({onSwitchTab}){
       {modal&&<Modal draft={modal.draft} filename={modal.filename} editMode={modal.editMode||false} onConfirm={handleConfirm} onDismiss={handleDismiss}/>}
 
       {/* Header */}
-      <div style={{borderBottom:`1px solid ${C.border}`,padding:"16px 20px",display:"flex",alignItems:"center",gap:12,background:C.bgCard}}>
+      <div style={{borderBottom:`1px solid ${C.border}`,padding:"14px 20px",display:"flex",alignItems:"center",gap:12,background:C.bgCard}}>
         <div style={{width:36,height:36,borderRadius:10,background:C.green,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🦘</div>
-        <div>
+        <div style={{flex:1,minWidth:0}}>
           <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.text,letterSpacing:"-0.02em"}}>Visa Run</div>
-          <div style={{fontSize:10,color:C.textFaint,marginTop:1}}>Count your days, live your run · Australia</div>
+          <div style={{fontSize:10,color:C.textFaint,marginTop:1}}>Scan your payslip · Track your days · Find work</div>
         </div>
-        <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
           {streak>0&&<div style={{background:C.amberBg,border:"1px solid #fde68a",borderRadius:8,padding:"5px 10px",fontSize:11,color:C.amber,fontWeight:700,display:"flex",alignItems:"center",gap:4}}><span>🔥</span>{streak}w</div>}
-          
+          {onSwitchTab&&<button onClick={()=>{onSwitchTab("jobs");window.scrollTo({top:0,behavior:"smooth"});}} style={{background:C.green,border:"none",borderRadius:9,padding:"7px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap"}}>Find Work →</button>}
         </div>
       </div>
 
