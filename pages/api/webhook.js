@@ -45,7 +45,8 @@ export default async function handler(req, res) {
     const email = session.customer_details?.email;
 
     if (email) {
-      // On connecte à Supabase avec la clé service (accès total)
+      // Normaliser l'email en lowercase pour éviter les bugs de casse
+      const normalizedEmail = email.toLowerCase().trim();
       const supabase = createClient(
         process.env.SUPABASE_URL,
         process.env.SUPABASE_SERVICE_KEY
@@ -55,14 +56,14 @@ export default async function handler(req, res) {
       const { data: existing } = await supabase
         .from("Customers")
         .select("email")
-        .eq("email", email)
+        .eq("email", normalizedEmail)
         .single();
 
       // Si l'email n'existe pas encore, on l'insère
       if (!existing) {
         const { error } = await supabase
           .from("Customers")
-          .insert({ email });
+          .insert({ email: normalizedEmail });
 
         if (error) {
           console.error("Supabase error:", error);
@@ -70,7 +71,7 @@ export default async function handler(req, res) {
         }
       }
 
-      console.log("✅ Customer saved:", email);
+      console.log("✅ Customer saved:", normalizedEmail);
 
       // Envoyer l'email directement via Resend (sans appel interne)
       try {
@@ -82,7 +83,7 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             from: "VisaRun <noreply@visarun.pro>",
-            to: [email],
+            to: [normalizedEmail],
             subject: "🦘 You're in, mate — VisaRun access is ready",
             html: `
 <!DOCTYPE html>
@@ -111,7 +112,7 @@ export default async function handler(req, res) {
       </div>
       <div style="background:#edf7f1;border:1px solid #b8e0c8;border-radius:10px;padding:12px 16px;">
         <span style="font-size:18px;margin-right:12px;">3️⃣</span>
-        <span style="color:#1a1a18;font-size:14px;">Click <strong>Unlock</strong> and enter: <span style="display:inline-block;margin-top:6px;background:#1a7a4a;color:#fff;padding:4px 12px;border-radius:6px;font-size:13px;font-weight:700;">${email}</span></span>
+        <span style="color:#1a1a18;font-size:14px;">Click <strong>Unlock</strong> and enter: <span style="display:inline-block;margin-top:6px;background:#1a7a4a;color:#fff;padding:4px 12px;border-radius:6px;font-size:13px;font-weight:700;">${normalizedEmail}</span></span>
       </div>
     </div>
     <div style="text-align:center;margin-bottom:16px;">
@@ -144,7 +145,7 @@ export default async function handler(req, res) {
         if (!resendRes.ok) {
           console.error("Resend error:", resendData);
         } else {
-          console.log("✅ Email sent to:", email);
+          console.log("✅ Email sent to:", normalizedEmail);
         }
       } catch (emailErr) {
         console.error("Email send error:", emailErr);
