@@ -563,10 +563,11 @@ export default function JobFinder({onSwitchTab}){
     setCityCoords(CITY_COORDS[city]);
     setCityName(city);
     setSearchMode("city");
+    setDistRadius(25); // Par défaut : Nearby (25km)
   },[]);
 
   const clearSearch=useCallback(()=>{
-    setSearch("");setSuggestions([]);setSearchMode("none");setCityCoords(null);setCityName("");
+    setSearch("");setSuggestions([]);setSearchMode("none");setCityCoords(null);setCityName("");setDistRadius(null);
   },[]);
 
   // Filter & sort
