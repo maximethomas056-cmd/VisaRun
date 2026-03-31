@@ -11,7 +11,7 @@ const C = {
   shadowLg:"0 8px 40px rgba(0,0,0,0.14)",
 };
 
-const FREE_LIMIT = 5;
+const FREE_LIMIT = 3;
 const PRICE = "$24.90 AUD";
 const DB_LAST_UPDATED = "March 2026"; // ← Mettre à jour manuellement quand tu enrichis la base
 

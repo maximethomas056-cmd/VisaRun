@@ -569,8 +569,8 @@ function FindWorkBanner({onSwitchTab}){
     <div onClick={()=>{onSwitchTab("jobs");setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),0);}} style={{background:"linear-gradient(135deg,#1a7a4a,#0d3d22)",borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 4px 16px rgba(26,122,74,0.25)",marginTop:12}}>
       <div style={{fontSize:26}}>🔍</div>
       <div style={{flex:1}}>
-        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"#fff",marginBottom:2}}>Find your employer directly</div>
-        <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"rgba(255,255,255,0.7)"}}>2,000+ contacts · Phone, email, Instagram · All 7 states</div>
+        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"#fff",marginBottom:2}}>Now find your next employer</div>
+        <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"rgba(255,255,255,0.7)"}}>2,000+ direct contacts · Phone, email, Instagram · All 7 states</div>
       </div>
       <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,color:"#fff",background:"rgba(255,255,255,0.15)",borderRadius:8,padding:"6px 12px",border:"1px solid rgba(255,255,255,0.2)",flexShrink:0}}>
         Browse →
@@ -687,7 +687,7 @@ export default function VisaRunApp({onSwitchTab}){
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
           {streak>0&&<div style={{background:C.amberBg,border:"1px solid #fde68a",borderRadius:8,padding:"5px 10px",fontSize:11,color:C.amber,fontWeight:700,display:"flex",alignItems:"center",gap:4}}><span>🔥</span>{streak}w</div>}
-          {onSwitchTab&&<button onClick={()=>{onSwitchTab("jobs");setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),0);}} style={{background:C.green,border:"none",borderRadius:9,padding:"7px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap"}}>Find Work →</button>}
+          {onSwitchTab&&<button onClick={()=>{onSwitchTab("jobs");setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),0);}} style={{background:C.green,border:"none",borderRadius:10,padding:"11px 16px",fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap",minHeight:44,minWidth:44}}>Find Work →</button>}
         </div>
       </div>
 
@@ -735,7 +735,6 @@ export default function VisaRunApp({onSwitchTab}){
               </div>
             </div>
             <StatCards totals={totals}/>
-            {onSwitchTab&&<FindWorkBanner onSwitchTab={onSwitchTab}/>}
           </div>
         )}
         {sorted.length>0&&(
