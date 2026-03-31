@@ -13,6 +13,7 @@ const C = {
 
 const FREE_LIMIT = 5;
 const PRICE = "$24.90 AUD";
+const DB_LAST_UPDATED = "March 2026"; // ← Mettre à jour manuellement quand tu enrichis la base
 
 const SECTORS = ["All","Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry","Other"];
 const STATES  = ["QLD","WA","NSW","VIC","TAS","NT","SA"];
@@ -644,6 +645,10 @@ export default function JobFinder({onSwitchTab}){
           <div>
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>Find employers directly.</div>
             <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginTop:3}}>2,000+ contacts · No middleman · No agency fees</div>
+            <div style={{display:"inline-flex",alignItems:"center",gap:6,background:"rgba(255,255,255,0.12)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:20,padding:"4px 12px",marginTop:8}}>
+              <span style={{fontSize:11,color:"rgba(255,255,255,0.8)",fontFamily:"'DM Sans',sans-serif"}}>Database updated:</span>
+              <span style={{fontSize:11,fontWeight:700,color:"#fff",fontFamily:"'DM Sans',sans-serif"}}>{DB_LAST_UPDATED}</span>
+            </div>
           </div>
           {!paid?(
             <div style={{display:"flex",gap:6,flexShrink:0}}>
