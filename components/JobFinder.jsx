@@ -29,7 +29,10 @@ const STATE_COLORS = {
   VIC:"#16a085", TAS:"#c0392b", NT:"#d35400", SA:"#27ae60",
 };
 
-// 300+ Australian cities with GPS coordinates
+// Slider steps: index 0 = Nearby (25km) → last index = Any
+const DIST_STEPS = [25, 50, 100, 150, 200, 300, 500, null]; // null = Any
+
+
 const CITY_COORDS = {
   // Major cities
   "Sydney":{lat:-33.87,lng:151.21},"Melbourne":{lat:-37.81,lng:144.96},
@@ -440,7 +443,7 @@ function EmployerModal({job, onClose, paid, onUnlock}){
 }
 
 export default function JobFinder({onSwitchTab}){
-  const[sector,setSector]=useState(null);
+  const[sectors,setSectors]=useState([]);
   const[stateF,setStateF]=useState(null);
   const[paid,setPaid]=useState(false);
   const[selectedJob,setSelectedJob]=useState(null);
@@ -456,7 +459,7 @@ export default function JobFinder({onSwitchTab}){
   const[emailInput,setEmailInput]=useState("");
   const[emailChecking,setEmailChecking]=useState(false);
   const[emailError,setEmailError]=useState("");
-  const[distRadius,setDistRadius]=useState(0);
+  const[distRadius,setDistRadius]=useState(null); // null = Any distance
   const savedHydrated=useRef(false);
   const searchRef=useRef();
 
@@ -569,23 +572,26 @@ export default function JobFinder({onSwitchTab}){
   // Filter & sort
   const filtered=useMemo(()=>JOB_DATA.filter(j=>{
     if(showSavedOnly&&!saved.includes(j.name))return false;
-    if(sector&&sector!=="All"){
-      if(sector==="Other"){
-        const eligible=["Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry"];
-        if(eligible.includes(j.sector))return false;
-      } else {
-        if(j.sector!==sector)return false;
-      }
+    if(sectors.length>0){
+      // Multi-sélection : OR entre les secteurs choisis
+      const match=sectors.some(s=>{
+        if(s==="Other"){
+          const eligible=["Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry"];
+          return !eligible.includes(j.sector);
+        }
+        return j.sector===s;
+      });
+      if(!match)return false;
     }
     if(stateF&&j.state!==stateF)return false;
-    if(cityCoords&&distRadius>0){
+    if(cityCoords&&distRadius!==null){
       const c=CITY_COORDS[j.city];
       if(!c)return false;
       const d=haversine(cityCoords.lat,cityCoords.lng,c.lat,c.lng);
       if(d>distRadius)return false;
     }
     return true;
-  }),[sector,stateF,showSavedOnly,saved,cityCoords,distRadius]);
+  }),[sectors,stateF,showSavedOnly,saved,cityCoords,distRadius]);
 
   const sorted=useMemo(()=>{
     if(cityCoords){
@@ -699,46 +705,68 @@ export default function JobFinder({onSwitchTab}){
           {/* Active city indicator + slider distance */}
           {searchMode==="city"&&cityCoords&&(
             <div style={{marginTop:8,background:C.bgCard,border:`1px solid ${C.greenBorder}`,borderRadius:10,padding:"10px 14px"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
                 <div style={{fontSize:11,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
                   <span>📍</span> {cityName}
                 </div>
-                <span style={{fontSize:11,color:C.green,fontWeight:700}}>{distRadius===0?"Any distance":`Within ${distRadius}km`}</span>
+                <span style={{fontSize:12,color:C.green,fontWeight:700,background:C.greenLight,borderRadius:7,padding:"3px 9px",border:`1px solid ${C.greenBorder}`}}>
+                  {distRadius===null?"🌏 Any distance":`📍 Within ${distRadius}km`}
+                </span>
               </div>
               <input
                 type="range"
                 min={0}
-                max={500}
-                step={25}
-                value={distRadius}
-                onChange={e=>setDistRadius(Number(e.target.value))}
-                style={{width:"100%",accentColor:C.green,cursor:"pointer"}}
+                max={DIST_STEPS.length-1}
+                step={1}
+                value={distRadius===null?DIST_STEPS.length-1:DIST_STEPS.indexOf(distRadius)===-1?DIST_STEPS.length-1:DIST_STEPS.indexOf(distRadius)}
+                onChange={e=>{
+                  const idx=Number(e.target.value);
+                  setDistRadius(DIST_STEPS[idx]);
+                }}
+                style={{width:"100%",accentColor:C.green,cursor:"pointer",marginBottom:4}}
               />
-              <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:C.textFaint,marginTop:2}}>
-                <span>Nearby</span><span>250km</span><span>Any</span>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:C.textFaint}}>
+                <span style={{fontWeight:600,color:C.green}}>📍 Nearby</span>
+                <span>100km</span>
+                <span>300km</span>
+                <span style={{fontWeight:600}}>Any</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Sector */}
+        {/* Sector — multi-sélection */}
         <div style={{marginBottom:12}}>
           <div style={{fontSize:9,color:C.textFaint,letterSpacing:"0.14em",textTransform:"uppercase",fontWeight:600,marginBottom:7}}>Sector</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-            {SECTORS.map(s=>{
-              const active=sector===s||(s==="All"&&!sector&&!showSavedOnly);
+            {/* Bouton All */}
+            <button key="All" className="jf-chip" onClick={()=>{setShowSavedOnly(false);setSectors([]);}} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${sectors.length===0&&!showSavedOnly?C.green:C.border}`,background:sectors.length===0&&!showSavedOnly?C.green:C.bgCard,color:sectors.length===0&&!showSavedOnly?"#fff":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+              {SECTOR_ICONS["All"]} All
+            </button>
+            {SECTORS.filter(s=>s!=="All").map(s=>{
+              const active=sectors.includes(s);
               return(
-                <button key={s} className="jf-chip" onClick={()=>{setShowSavedOnly(false);setSector(s==="All"?null:sector===s?null:s);}} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${active?C.green:C.border}`,background:active?C.green:C.bgCard,color:active?"#fff":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                <button key={s} className="jf-chip" onClick={()=>{
+                  setShowSavedOnly(false);
+                  setSectors(prev=>prev.includes(s)?prev.filter(x=>x!==s):[...prev,s]);
+                }} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${active?C.green:C.border}`,background:active?C.green:C.bgCard,color:active?"#fff":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
                   {SECTOR_ICONS[s]} {s}
                 </button>
               );
             })}
             {saved.length>0&&(
-              <button className="jf-chip" onClick={()=>{setSector(null);setShowSavedOnly(p=>!p);}} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${showSavedOnly?"#f59e0b":C.border}`,background:showSavedOnly?"#fef9ec":C.bgCard,color:showSavedOnly?"#b45309":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+              <button className="jf-chip" onClick={()=>{setSectors([]);setShowSavedOnly(p=>!p);}} style={{padding:"7px 12px",borderRadius:9,border:`1.5px solid ${showSavedOnly?"#f59e0b":C.border}`,background:showSavedOnly?"#fef9ec":C.bgCard,color:showSavedOnly?"#b45309":C.textMid,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
                 ⭐ Saved <span style={{background:showSavedOnly?"#f59e0b":"#e2e8f0",color:showSavedOnly?"#fff":"#64748b",borderRadius:20,padding:"1px 7px",fontSize:11,fontWeight:700}}>{saved.length}</span>
               </button>
             )}
           </div>
+          {/* Indicateur secteurs actifs */}
+          {sectors.length>1&&(
+            <div style={{marginTop:6,fontSize:11,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+              <span>✓</span> {sectors.join(" + ")}
+              <button onClick={()=>setSectors([])} style={{background:"none",border:"none",color:C.textFaint,cursor:"pointer",fontSize:11,padding:"0 4px"}}>✕ Clear</button>
+            </div>
+          )}
         </div>
 
         {/* State */}
@@ -773,7 +801,7 @@ export default function JobFinder({onSwitchTab}){
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:C.text,marginBottom:8}}>No results found</div>
             <div style={{fontSize:13,color:C.textFaint,marginBottom:16}}>Try removing a filter</div>
             <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
-              {sector&&<button onClick={()=>setSector(null)} style={{padding:"8px 14px",borderRadius:9,border:`1.5px solid ${C.green}`,background:C.greenLight,color:C.green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>✕ Remove "{sector}"</button>}
+              {sectors.length>0&&<button onClick={()=>setSectors([])} style={{padding:"8px 14px",borderRadius:9,border:`1.5px solid ${C.green}`,background:C.greenLight,color:C.green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>✕ Remove sector filters</button>}
               {stateF&&<button onClick={()=>setStateF(null)} style={{padding:"8px 14px",borderRadius:9,border:`1.5px solid ${C.green}`,background:C.greenLight,color:C.green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>✕ Remove "{stateF}"</button>}
             </div>
           </div>
