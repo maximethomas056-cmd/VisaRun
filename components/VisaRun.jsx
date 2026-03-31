@@ -709,7 +709,7 @@ export default function VisaRunApp({onSwitchTab}){
                 {dragging?"Drop it! 🎯":"Scan your payslip."}
               </div>
               <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:C.textFaint,marginBottom:20,lineHeight:1.6}}>
-                AI reads it in seconds.<br/>Your regional work days are counted automatically.
+                Scan & auto-fill your work days.<br/>Drop a payslip — PDF or photo, results in seconds.
               </div>
               <button
                 onClick={e=>{e.stopPropagation();fileRef.current?.click();}}
