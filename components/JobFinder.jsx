@@ -651,13 +651,15 @@ export default function JobFinder({onSwitchTab}){
             </div>
           </div>
           {!paid?(
-            <div style={{display:"flex",gap:6,flexShrink:0}}>
-              <button onClick={()=>setShowEmailModal(true)} style={{background:"rgba(255,255,255,0.15)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:10,padding:"8px 12px",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap"}}>
-                Sign in
-              </button>
-              <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{background:"#fff",borderRadius:10,padding:"8px 12px",color:C.green,fontSize:11,fontWeight:700,textDecoration:"none",display:"flex",alignItems:"center",gap:4,whiteSpace:"nowrap"}}>
-                🔓 {PRICE}
+            <div style={{display:"flex",flexDirection:"column",gap:6,flexShrink:0,alignItems:"flex-end"}}>
+              {/* Bouton principal — valeur d'abord, prix après */}
+              <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{background:"#fff",borderRadius:10,padding:"9px 14px",color:C.green,fontSize:12,fontWeight:700,textDecoration:"none",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap",boxShadow:"0 2px 8px rgba(0,0,0,0.15)"}}>
+                🔓 2,000+ contacts · {PRICE}
               </a>
+              {/* Bouton secondaire — discret */}
+              <button onClick={()=>setShowEmailModal(true)} style={{background:"transparent",border:"none",padding:"2px 4px",color:"rgba(255,255,255,0.6)",fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap",textDecoration:"underline",textUnderlineOffset:3}}>
+                I already paid →
+              </button>
             </div>
           ):(
             <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>✓ Full access</div>
