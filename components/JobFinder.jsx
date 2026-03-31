@@ -489,16 +489,23 @@ export default function JobFinder({onSwitchTab}){
     setEmailChecking(true);
     setEmailError("");
     try{
+      const normalizedEmail=email.toLowerCase().trim();
       const res=await fetch("/api/check-access",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({email:email.toLowerCase().trim()})
+        body:JSON.stringify({email:normalizedEmail})
       });
       const data=await res.json();
       if(data.paid){
-        localStorage.setItem("vr_paid_email",email.toLowerCase().trim());
+        localStorage.setItem("vr_paid_email",normalizedEmail);
         setPaid(true);
         setShowEmailModal(false);
+        // Envoyer le mail welcome back via route serveur dédiée
+        fetch("/api/welcome-email",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({email:normalizedEmail})
+        }).catch(()=>{});
       } else {
         setShowEmailModal(false);
         setShowPayment(true);
