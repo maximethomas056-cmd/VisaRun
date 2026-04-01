@@ -14,6 +14,7 @@ const C = {
 const FREE_LIMIT = 3;
 const PRICE = "$24.90 AUD";
 const DB_LAST_UPDATED = "March 2026"; // ← Mettre à jour manuellement quand tu enrichis la base
+const EMPLOYER_COUNT = "2,000+";     // ← Mettre à jour quand la DB grandit via Apify
 
 const SECTORS = ["All","Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry","Other"];
 const STATES  = ["QLD","WA","NSW","VIC","TAS","NT","SA"];
@@ -294,7 +295,7 @@ function PaymentModal({onClose, onAlreadyPaid}){
             Updated contacts · Not random Google results
           </div>
           <a href={STRIPE_URL} target="_blank" rel="noopener noreferrer" style={{display:"block",width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textAlign:"center",textDecoration:"none",boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
-            🔓 Unlock 2,000+ employer contacts — {PRICE}
+            🔓 Unlock {EMPLOYER_COUNT} employer contacts — {PRICE}
           </a>
           <div style={{display:"flex",justifyContent:"center",gap:14,marginBottom:14}}>
             {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
@@ -644,7 +645,7 @@ export default function JobFinder({onSwitchTab}){
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
           <div>
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>Find employers directly.</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginTop:3}}>2,000+ contacts · No middleman · No agency fees</div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginTop:3}}>{EMPLOYER_COUNT} contacts · No middleman · No agency fees</div>
             <div style={{display:"inline-flex",alignItems:"center",gap:6,background:"rgba(255,255,255,0.12)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:20,padding:"4px 12px",marginTop:8}}>
               <span style={{fontSize:11,color:"rgba(255,255,255,0.8)",fontFamily:"'DM Sans',sans-serif"}}>Database updated:</span>
               <span style={{fontSize:11,fontWeight:700,color:"#fff",fontFamily:"'DM Sans',sans-serif"}}>{DB_LAST_UPDATED}</span>
@@ -654,7 +655,7 @@ export default function JobFinder({onSwitchTab}){
             <div style={{display:"flex",flexDirection:"column",gap:6,flexShrink:0,alignItems:"flex-end"}}>
               {/* Bouton principal — valeur d'abord, prix après */}
               <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{background:"#fff",borderRadius:10,padding:"9px 14px",color:C.green,fontSize:12,fontWeight:700,textDecoration:"none",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap",boxShadow:"0 2px 8px rgba(0,0,0,0.15)"}}>
-                🔓 2,000+ contacts · {PRICE}
+                🔓 {EMPLOYER_COUNT} contacts · {PRICE}
               </a>
               {/* Bouton secondaire — discret */}
               <button onClick={()=>setShowEmailModal(true)} style={{background:"transparent",border:"none",padding:"2px 4px",color:"rgba(255,255,255,0.6)",fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap",textDecoration:"underline",textUnderlineOffset:3}}>
@@ -883,10 +884,10 @@ export default function JobFinder({onSwitchTab}){
             {showWall&&(
               <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{display:"block",marginTop:12,background:C.bgCard,border:`1.5px solid ${C.greenBorder}`,borderRadius:18,padding:"20px",textAlign:"center",textDecoration:"none",cursor:"pointer"}}>
                 <div style={{fontSize:24,marginBottom:8}}>🔒</div>
-                <div style={{fontFamily:"'Playfair Display',serif",fontSize:19,fontWeight:700,color:C.text,marginBottom:4}}>2,000+ direct employer contacts</div>
+                <div style={{fontFamily:"'Playfair Display',serif",fontSize:19,fontWeight:700,color:C.text,marginBottom:4}}>{EMPLOYER_COUNT} direct employer contacts</div>
                 <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:C.textFaint,marginBottom:14,lineHeight:1.6}}>Updated contacts · Not random Google results</div>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,marginBottom:12}}>
-                  {[["2,000+","employers"],["7","states"],["$24.90","one-time"]].map(([n,l])=>(
+                  {[[EMPLOYER_COUNT,"employers"],["7","states"],["$24.90","one-time"]].map(([n,l])=>(
                     <div key={l} style={{background:C.bgMuted,borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
                       <div style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:C.green,lineHeight:1}}>{n}</div>
                       <div style={{fontSize:10,color:C.textFaint,marginTop:3}}>{l}</div>
@@ -895,7 +896,7 @@ export default function JobFinder({onSwitchTab}){
                 </div>
                 <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,marginBottom:10}}>✅ Lifetime access · One-time payment · No subscription</div>
                 <div style={{width:"100%",padding:"15px",borderRadius:13,background:C.green,color:"#fff",fontSize:15,fontWeight:700,fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
-                  🔓 Unlock 2,000+ employer contacts — {PRICE}
+                  🔓 Unlock {EMPLOYER_COUNT} employer contacts — {PRICE}
                 </div>
                 <div style={{display:"flex",justifyContent:"center",gap:14}}>
                   {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
