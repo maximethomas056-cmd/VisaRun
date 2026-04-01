@@ -264,7 +264,7 @@ function ScanOverlay({draft}){
     {label:"Period",value:draft.date||"—",y:32},
     {label:"Gross Pay",value:draft.gross>0?fmt(draft.gross):"—",y:50},
     {label:"Hours",value:draft.hoursWorked>0?`${draft.hoursWorked}h`:"—",y:66},
-    {label:"Visa days",value:draft.farmDays>0?`+${fmtN(draft.farmDays)}d`:"—",y:82,highlight:true},
+    {label:"Visa days",value:draft.farmDays>0?`+${Math.floor(draft.farmDays)}d`:"—",y:82,highlight:true},
   ]:[];
   useEffect(()=>{const start=Date.now(),dur=2200;const tick=()=>{const p=Math.min((Date.now()-start)/dur*100,100);setScanPct(p);if(p<100)requestAnimationFrame(tick);};requestAnimationFrame(tick);},[]);
   return(
@@ -409,11 +409,10 @@ function EntryCard({entry,index,isLast,onDelete,onEdit}){
             {!entry.hoursWorked||entry.hoursWorked===0?(
               <div style={{display:"inline-flex",alignItems:"center",gap:4,background:C.amberBg,border:"1px solid #fde68a",borderRadius:8,padding:"4px 10px"}}><span style={{fontSize:12}}>⚠️</span><span style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.amber,fontWeight:600}}>Hours missing</span></div>
             ):raw===0?(
-              <div style={{display:"inline-flex",alignItems:"baseline",gap:2,background:C.redBg,border:"1px solid #fca5a5",borderRadius:8,padding:"4px 10px"}}><span style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.red}}>+0.0</span><span style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.red,fontWeight:600}}>d visa</span></div>
+              <div style={{display:"inline-flex",alignItems:"baseline",gap:2,background:C.redBg,border:"1px solid #fca5a5",borderRadius:8,padding:"4px 10px"}}><span style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.red}}>+0</span><span style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.red,fontWeight:600}}>d visa</span></div>
             ):(
-              <div style={{display:"inline-flex",alignItems:"baseline",gap:2,background:C.greenBg,border:`1px solid ${C.greenBorder}`,borderRadius:8,padding:"4px 10px"}}><span style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.green}}>+{fmtN(raw)}</span><span style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.green,fontWeight:600}}>d visa</span></div>
+              <div style={{display:"inline-flex",alignItems:"baseline",gap:2,background:C.greenBg,border:`1px solid ${C.greenBorder}`,borderRadius:8,padding:"4px 10px"}}><span style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:C.green}}>+{floor}</span><span style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.green,fontWeight:600}}>d visa</span></div>
             )}
-            {hasDecimal&&raw>0&&<div style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:C.textFaint,marginTop:2,textAlign:"center"}}>{floor} counted</div>}
           </div>
         </div>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:10,paddingTop:10,borderTop:`1px solid ${C.border}`,minWidth:0}}>
@@ -477,10 +476,9 @@ function Modal({draft,filename,onConfirm,onDismiss,editMode=false}){
             {vdRaw>0?(
               <div style={{background:C.greenBg,border:`1.5px solid ${C.greenBorder}`,borderRadius:14,padding:"20px 24px",textAlign:"center",marginBottom:16}}>
                 <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.green,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600,marginBottom:6}}>We detected</div>
-                <div style={{fontFamily:"'Playfair Display',serif",fontSize:48,fontWeight:700,color:C.green,lineHeight:1}}>+{fmtN(vdRaw)}</div>
+                <div style={{fontFamily:"'Playfair Display',serif",fontSize:48,fontWeight:700,color:C.green,lineHeight:1}}>+{vdFloor}</div>
                 <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:C.green,marginTop:4,fontWeight:500}}>visa farm days</div>
                 <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textMid,marginTop:8}}>{lh}h worked over {lp} days</div>
-                {hasDecimal&&<div style={{marginTop:10,padding:"8px 12px",background:"rgba(180,83,9,0.07)",borderRadius:8,fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.amber}}>ℹ️ Immigration counts full days only — <strong>{vdFloor}</strong> counted.</div>}
               </div>
             ):(
               <div style={{background:C.amberBg,border:"1px solid #fde68a",borderRadius:14,padding:16,textAlign:"center",marginBottom:16}}>
@@ -526,11 +524,11 @@ function Modal({draft,filename,onConfirm,onDismiss,editMode=false}){
                 <div><label style={{...LBL,color:lp>0?C.textFaint:lh>0?C.amber:C.textFaint}}>Period length{lh>0&&!lp?" ⚠":""}</label><input style={INP(lh>0&&!lp)} value={v.pDays} onChange={setE("pDays")} placeholder="14"/></div>
               </div>
               {missingPeriod&&<div style={{display:"flex",gap:6,marginBottom:10}}>{weekShort.map(([d,l])=><button key={d} className="period-btn" onClick={()=>setV(p=>({...p,pDays:d}))} style={{flex:1,padding:"6px 4px",borderRadius:7,border:`1px solid ${C.greenBorder}`,background:C.bgCard,color:C.textMid,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:11}}>{l}</button>)}</div>}
-              {lh>0&&lp>0&&<div style={{background:C.bgCard,borderRadius:8,padding:"8px 10px",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textMid}}>{lh}h worked over {lp} days{hasDecimal&&<div style={{fontSize:9,color:C.amber,marginTop:2}}>{vdFloor} counted</div>}</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:vdRaw>0?C.green:C.red}}>{vdRaw>0?"+"+fmtN(vdRaw):"?"}</div></div>}
+              {lh>0&&lp>0&&<div style={{background:C.bgCard,borderRadius:8,padding:"8px 10px",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textMid}}>{lh}h worked over {lp} days</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:vdFloor>0?C.green:C.red}}>{vdFloor>0?"+"+vdFloor:"?"}</div></div>}
             </div>
             <div style={{marginBottom:14}}>
-              <label style={{...LBL}}>Visa days <span style={{color:C.textFaint,fontWeight:400,textTransform:"none",letterSpacing:0}}>(override — auto{vdRaw>0?": "+fmtN(vdRaw)+"d":""})</span></label>
-              <input type="number" inputMode="decimal" value={overrideDays??""} onChange={e=>setOverrideDays(e.target.value||null)} placeholder={vdRaw>0?fmtN(vdRaw)+" (auto)":"leave blank = auto"} style={{...INP(),color:overrideDays?C.green:C.textFaint,fontWeight:overrideDays?700:400}}/>
+              <label style={{...LBL}}>Visa days <span style={{color:C.textFaint,fontWeight:400,textTransform:"none",letterSpacing:0}}>(override — auto{vdFloor>0?": "+vdFloor+"d":""})</span></label>
+              <input type="number" inputMode="decimal" value={overrideDays??""} onChange={e=>setOverrideDays(e.target.value||null)} placeholder={vdFloor>0?vdFloor+" (auto)":"leave blank = auto"} style={{...INP(),color:overrideDays?C.green:C.textFaint,fontWeight:overrideDays?700:400}}/>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
               <div><label style={LBL}>Period</label><input style={INP()} value={v.date} onChange={setE("date")} placeholder="01/06 – 14/06"/></div>
@@ -637,7 +635,7 @@ export default function VisaRunApp({onSwitchTab}){
 
   const deleteEntry=useCallback(i=>{const e=sorted[i];setEntries(p=>p.filter(x=>x!==e));showToast("Payslip deleted.",false);},[sorted]);
   const editEntry=useCallback(entry=>{setModal({draft:entry,filename:entry.filename||"",editMode:true,originalEntry:entry});},[]);
-  const addEntry=useCallback((data,filename)=>{setEntries(p=>[{...data,filename},...p]);const raw=data.farmDays??0;const last=data.name?.split(/[\s,]+/).filter(Boolean).pop()||"";showToast(`${last}\n${fmt(data.gross)} gross · +${fmtN(raw)} d visa`);setRooJump(true);setTimeout(()=>setRooJump(false),1200);},[]);
+  const addEntry=useCallback((data,filename)=>{setEntries(p=>[{...data,filename},...p]);const raw=data.farmDays??0;const last=data.name?.split(/[\s,]+/).filter(Boolean).pop()||"";showToast(`${last}\n${fmt(data.gross)} gross · +${Math.floor(raw)} d visa`);setRooJump(true);setTimeout(()=>setRooJump(false),1200);},[]);
   const saveEdit=useCallback((data,originalEntry)=>{setEntries(p=>p.map(e=>e===originalEntry?{...data,filename:originalEntry.filename}:e));showToast("Payslip updated ✓");},[]);
 
   const processFiles=useCallback(async(files)=>{
@@ -742,7 +740,7 @@ export default function VisaRunApp({onSwitchTab}){
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:18,marginTop:4}}>
               <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,color:C.textFaint,letterSpacing:"0.15em",textTransform:"uppercase",fontWeight:600}}>History · {sorted.length} {sorted.length>1?"payslips":"payslip"}</div>
               <div style={{flex:1,height:1,background:C.border}}/>
-              <div style={{fontFamily:"'Playfair Display',serif",fontSize:11,fontStyle:"italic",color:C.teal}}>{fmtN(entries.reduce((s,e)=>s+(e.farmDays??0),0))} days accumulated</div>
+              <div style={{fontFamily:"'Playfair Display',serif",fontSize:11,fontStyle:"italic",color:C.teal}}>{entries.reduce((s,e)=>s+Math.floor(e.farmDays??0),0)} days accumulated</div>
             </div>
             {sorted.map((e,i)=><EntryCard key={e.filename+i} entry={e} index={i} isLast={i===sorted.length-1} onDelete={deleteEntry} onEdit={editEntry}/>)}
             <div className="drop-zone" onClick={()=>fileRef.current?.click()} style={{border:`2px dashed ${dragging?C.green:C.greenBorder}`,borderRadius:12,padding:"14px 20px",textAlign:"center",cursor:"pointer",marginTop:12,background:dragging?C.greenBg:C.greenLight,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
