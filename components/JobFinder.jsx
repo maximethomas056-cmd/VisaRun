@@ -16,6 +16,17 @@ const PRICE = "$24.90 AUD";
 const DB_LAST_UPDATED = "March 2026"; // ← Mettre à jour manuellement quand tu enrichis la base
 const EMPLOYER_COUNT = "2,000+";     // ← Mettre à jour quand la DB grandit via Apify
 
+// Détecte si on est sur mobile (< 600px) — utilisé pour adapter le header
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 600 : false);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 600);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return isMobile;
+}
+
 const SECTORS = ["All","Farm","Mine","Construction","Roadhouse","Solar","Fish","Abattoir","Forestry","Other"];
 const STATES  = ["QLD","WA","NSW","VIC","TAS","NT","SA"];
 const STATE_ORDER = {QLD:0,WA:1,NSW:2,VIC:3,TAS:4,NT:5,SA:6};
@@ -296,8 +307,6 @@ function PaymentModal({onClose, onAlreadyPaid}){
           </div>
           <a href={STRIPE_URL} target="_blank" rel="noopener noreferrer" style={{display:"block",width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textAlign:"center",textDecoration:"none",boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
             🔓 Unlock {EMPLOYER_COUNT} employer contacts — {PRICE}
-          </a>
-          <div style={{display:"flex",justifyContent:"center",gap:14,marginBottom:14}}>
             {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
               <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
             ))}
@@ -464,6 +473,7 @@ export default function JobFinder({onSwitchTab}){
   const[distRadius,setDistRadius]=useState(null); // null = Any distance
   const savedHydrated=useRef(false);
   const searchRef=useRef();
+  const isMobile=useIsMobile();
 
   // Load saved jobs + check paid status client-side only
   useEffect(()=>{
@@ -642,37 +652,64 @@ export default function JobFinder({onSwitchTab}){
 
       {/* Hero */}
       <div style={{background:"linear-gradient(135deg,#1a7a4a 0%,#0d3d22 100%)",padding:"22px 18px 20px"}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+        {isMobile?(
+          /* ── Layout mobile : vertical, bouton pleine largeur ── */
           <div>
-            <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>Find employers directly.</div>
-            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginTop:3}}>{EMPLOYER_COUNT} contacts · No middleman · No agency fees</div>
-            <div style={{display:"inline-flex",alignItems:"center",gap:6,background:"rgba(255,255,255,0.12)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:20,padding:"4px 12px",marginTop:8}}>
-              <span style={{fontSize:11,color:"rgba(255,255,255,0.8)",fontFamily:"'DM Sans',sans-serif"}}>Database updated:</span>
-              <span style={{fontSize:11,fontWeight:700,color:"#fff",fontFamily:"'DM Sans',sans-serif"}}>{DB_LAST_UPDATED}</span>
-            </div>
+            <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#fff",lineHeight:1.2,marginBottom:4}}>Find employers directly.</div>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginBottom:12}}>{EMPLOYER_COUNT} contacts · No middleman · No agency fees</div>
+            {!paid?(
+              <>
+                <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,width:"100%",padding:"14px",borderRadius:12,background:"#fff",color:C.green,fontSize:15,fontWeight:700,textDecoration:"none",boxShadow:"0 2px 8px rgba(0,0,0,0.15)",boxSizing:"border-box",marginBottom:8}}>
+                  🔓 {EMPLOYER_COUNT} contacts · {PRICE}
+                </a>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+                  <div style={{display:"inline-flex",alignItems:"center",gap:5,background:"rgba(255,255,255,0.12)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:20,padding:"4px 10px"}}>
+                    <span style={{fontSize:10,color:"rgba(255,255,255,0.8)",fontFamily:"'DM Sans',sans-serif"}}>Updated:</span>
+                    <span style={{fontSize:10,fontWeight:700,color:"#fff",fontFamily:"'DM Sans',sans-serif"}}>{DB_LAST_UPDATED}</span>
+                  </div>
+                  <button onClick={()=>setShowEmailModal(true)} style={{background:"transparent",border:"none",padding:"2px 4px",color:"rgba(255,255,255,0.6)",fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textDecoration:"underline",textUnderlineOffset:3}}>
+                    I already paid →
+                  </button>
+                </div>
+              </>
+            ):(
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+                <div style={{display:"inline-flex",alignItems:"center",gap:5,background:"rgba(255,255,255,0.12)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:20,padding:"4px 10px"}}>
+                  <span style={{fontSize:10,color:"rgba(255,255,255,0.8)",fontFamily:"'DM Sans',sans-serif"}}>Updated:</span>
+                  <span style={{fontSize:10,fontWeight:700,color:"#fff",fontFamily:"'DM Sans',sans-serif"}}>{DB_LAST_UPDATED}</span>
+                </div>
+                <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>✓ Full access</div>
+              </div>
+            )}
           </div>
-          {!paid?(
-            <div style={{display:"flex",flexDirection:"column",gap:6,flexShrink:0,alignItems:"flex-end"}}>
-              {/* Bouton principal — valeur d'abord, prix après */}
-              <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{background:"#fff",borderRadius:10,padding:"9px 14px",color:C.green,fontSize:12,fontWeight:700,textDecoration:"none",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap",boxShadow:"0 2px 8px rgba(0,0,0,0.15)"}}>
-                🔓 {EMPLOYER_COUNT} contacts · {PRICE}
-              </a>
-              {/* Bouton secondaire — discret */}
-              <button onClick={()=>setShowEmailModal(true)} style={{background:"transparent",border:"none",padding:"2px 4px",color:"rgba(255,255,255,0.6)",fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap",textDecoration:"underline",textUnderlineOffset:3}}>
-                I already paid →
-              </button>
+        ):(
+          /* ── Layout desktop/iPad : flex row inchangé ── */
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+            <div>
+              <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>Find employers directly.</div>
+              <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.65)",marginTop:3}}>{EMPLOYER_COUNT} contacts · No middleman · No agency fees</div>
+              <div style={{display:"inline-flex",alignItems:"center",gap:6,background:"rgba(255,255,255,0.12)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:20,padding:"4px 12px",marginTop:8}}>
+                <span style={{fontSize:11,color:"rgba(255,255,255,0.8)",fontFamily:"'DM Sans',sans-serif"}}>Database updated:</span>
+                <span style={{fontSize:11,fontWeight:700,color:"#fff",fontFamily:"'DM Sans',sans-serif"}}>{DB_LAST_UPDATED}</span>
+              </div>
             </div>
-          ):(
-            <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>✓ Full access</div>
-          )}
-        </div>
+            {!paid?(
+              <div style={{display:"flex",flexDirection:"column",gap:6,flexShrink:0,alignItems:"flex-end"}}>
+                <a href="https://buy.stripe.com/dRm9AS0Ze03sb1n0UX4Rq00" target="_blank" rel="noopener noreferrer" style={{background:"#fff",borderRadius:10,padding:"9px 14px",color:C.green,fontSize:12,fontWeight:700,textDecoration:"none",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap",boxShadow:"0 2px 8px rgba(0,0,0,0.15)"}}>
+                  🔓 {EMPLOYER_COUNT} contacts · {PRICE}
+                </a>
+                <button onClick={()=>setShowEmailModal(true)} style={{background:"transparent",border:"none",padding:"2px 4px",color:"rgba(255,255,255,0.6)",fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap",textDecoration:"underline",textUnderlineOffset:3}}>
+                  I already paid →
+                </button>
+              </div>
+            ):(
+              <div style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:600,color:"#fff"}}>✓ Full access</div>
+            )}
+          </div>
+        )}
+        {/* Badges — identiques mobile et desktop */}
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-          {[
-            ["📞","Direct phone"],
-            ["✉️","Email"],
-            ["📸","Instagram"],
-            ["👥","Facebook"],
-          ].map(([icon,label])=>(
+          {[["📞","Direct phone"],["✉️","Email"],["📸","Instagram"],["👥","Facebook"]].map(([icon,label])=>(
             <div key={label} style={{display:"flex",alignItems:"center",gap:5,background:"rgba(255,255,255,0.12)",borderRadius:8,padding:"5px 10px",border:"1px solid rgba(255,255,255,0.15)"}}>
               <span style={{fontSize:12}}>{icon}</span>
               <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.9)"}}>{label}</span>
@@ -695,7 +732,7 @@ export default function JobFinder({onSwitchTab}){
               value={search}
               onChange={e=>handleSearchChange(e.target.value)}
               placeholder="Search by city…"
-              style={{width:"100%",padding:"12px 36px 12px 38px",borderRadius:12,border:`1.5px solid ${searchMode==="city"?C.green:C.border}`,background:C.bgCard,fontSize:13,fontFamily:"'DM Sans',sans-serif",color:C.text,boxSizing:"border-box",transition:"border-color 0.2s"}}
+              style={{width:"100%",padding:"12px 36px 12px 38px",borderRadius:12,border:`1.5px solid ${searchMode==="city"?C.green:C.border}`,background:C.bgCard,fontSize:16,fontFamily:"'DM Sans',sans-serif",color:C.text,boxSizing:"border-box",transition:"border-color 0.2s"}}
             />
             {search&&<button onClick={clearSearch} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",fontSize:16,color:C.textFaint,cursor:"pointer"}}>✕</button>}
           </div>
