@@ -1,5 +1,9 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 
+// ── Mettre à jour quand la DB grandit via Apify ───────────────────────────
+const EMPLOYER_COUNT = "2,000+"; // ← Même valeur que dans JobFinder.jsx
+// ─────────────────────────────────────────────────────────────────────────
+
 const fmt  = (v) => `$${Number(v).toLocaleString("en-AU",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 const fmtN = (v) => Number(v).toLocaleString("en-AU",{minimumFractionDigits:1,maximumFractionDigits:1});
 const pn   = (s="") => Math.abs(parseFloat(String(s).replace(/[$,\s]/g,""))||0);
@@ -568,7 +572,7 @@ function FindWorkBanner({onSwitchTab}){
       <div style={{fontSize:26}}>🔍</div>
       <div style={{flex:1}}>
         <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"#fff",marginBottom:2}}>Now find your next employer</div>
-        <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"rgba(255,255,255,0.7)"}}>2,000+ direct contacts · Phone, email, Instagram · All 7 states</div>
+        <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:"rgba(255,255,255,0.7)"}}>{EMPLOYER_COUNT} direct contacts · Phone, email, Instagram & Facebook · All 7 states</div>
       </div>
       <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,color:"#fff",background:"rgba(255,255,255,0.15)",borderRadius:8,padding:"6px 12px",border:"1px solid rgba(255,255,255,0.2)",flexShrink:0}}>
         Browse →
