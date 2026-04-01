@@ -57,6 +57,10 @@ const FAQ_ITEMS = [
     icon: "📅",
     questions: [
       {
+        q: "How exactly does VisaRun count my regional work days?",
+        a: "VisaRun estimates your eligible days based on your hours worked and pay period length, using a 35-hour full-time equivalent week. This threshold is consistent with what registered migration agents and immigration research — including direct correspondence with the Department of Home Affairs — consider the most reliable benchmark for casual workers in horticulture and agriculture.\n\nExample: 76 hours over 14 days = 38h/week → above the 35h threshold → 14 days counted.\n\nImportant: Immigration Australia does not publish a fixed formula. The official rule is that you must work the equivalent of a full-time employee in your role over the same period. Your actual count may vary depending on your industry, your employer's normal shift length, and the immigration officer reviewing your application.\n\nVisaRun gives you the most defensible estimate based on current knowledge — but always keep your payslips, timesheets, and an employer letter confirming your normal roster. These documents are your real evidence, not our calculator."
+      },
+      {
         q: "How are eligible days calculated?",
         a: "We estimate based on your hours worked and pay period length. The formula follows Australian immigration guidelines for regional work. Always verify your final count with an official migration agent or homeaffairs.gov.au."
       },
@@ -119,7 +123,11 @@ function FAQ() {
                       <span style={{ fontSize: 16, color: open ? "#1a7a4a" : "#9a9488", transform: open ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.2s", flexShrink: 0 }}>+</span>
                     </button>
                     {open && (
-                      <div style={{ padding: "0 14px 12px", fontSize: 13, color: "#5a5850", lineHeight: 1.7 }}>{item.a}</div>
+                      <div style={{ padding: "0 14px 12px", fontSize: 13, color: "#5a5850", lineHeight: 1.7 }}>
+                        {item.a.split("\n\n").map((para, pi) => (
+                          <p key={pi} style={{ margin: pi === 0 ? "0 0 10px" : "0 0 10px" }}>{para}</p>
+                        ))}
+                      </div>
                     )}
                   </div>
                 );
