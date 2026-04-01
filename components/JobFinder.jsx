@@ -307,6 +307,8 @@ function PaymentModal({onClose, onAlreadyPaid}){
           </div>
           <a href={STRIPE_URL} target="_blank" rel="noopener noreferrer" style={{display:"block",width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textAlign:"center",textDecoration:"none",boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
             🔓 Unlock {EMPLOYER_COUNT} employer contacts — {PRICE}
+          </a>
+          <div style={{display:"flex",justifyContent:"center",gap:14,marginBottom:14}}>
             {["🔐 Secure","⚡ Instant access","✅ Lifetime"].map(t=>(
               <span key={t} style={{fontSize:10,color:C.textFaint}}>{t}</span>
             ))}
