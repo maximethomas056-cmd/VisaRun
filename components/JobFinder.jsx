@@ -305,7 +305,7 @@ function PaymentModal({onClose, onAlreadyPaid}){
           <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:C.textFaint,textAlign:"center",marginBottom:14}}>
             Updated contacts · Not random Google results
           </div>
-          <a href={STRIPE_URL} target="_blank" rel="noopener noreferrer" style={{display:"block",width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textAlign:"center",textDecoration:"none",boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
+          <a href={STRIPE_URL} target="_blank" rel="noopener noreferrer" onClick={()=>{if(typeof window !== "undefined" && window.posthog) window.posthog.capture("checkout_clicked");}} style={{display:"block",width:"100%",padding:"16px",borderRadius:13,border:"none",background:C.green,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textAlign:"center",textDecoration:"none",boxShadow:"0 4px 16px rgba(26,122,74,0.3)",marginBottom:10,boxSizing:"border-box"}}>
             🔓 Unlock {EMPLOYER_COUNT} employer contacts — {PRICE}
           </a>
           <div style={{display:"flex",justifyContent:"center",gap:14,marginBottom:14}}>
@@ -519,6 +519,7 @@ export default function JobFinder({onSwitchTab}){
         // → partager son email à quelqu'un ne suffit plus pour accéder
         localStorage.setItem("vr_access_token", data.token);
         setPaid(true);
+        if(typeof window !== "undefined" && window.posthog) window.posthog.capture("signin_success");
         setShowEmailModal(false);
         // Envoyer le mail welcome back via route serveur dédiée
         fetch("/api/welcome-email",{
@@ -529,6 +530,7 @@ export default function JobFinder({onSwitchTab}){
       } else {
         setShowEmailModal(false);
         setShowPayment(true);
+        if(typeof window !== "undefined" && window.posthog) window.posthog.capture("paywall_seen", {source: "email_not_found"});
       }
     }catch{
       setEmailError("Connection error. Please try again.");
@@ -646,7 +648,7 @@ export default function JobFinder({onSwitchTab}){
     <div style={{background:C.bg,minHeight:"100vh",fontFamily:"'DM Sans',sans-serif"}}>
 
       {selectedJob&&!showPayment&&(
-        <EmployerModal job={selectedJob} onClose={()=>setSelectedJob(null)} paid={paid} onUnlock={()=>{setSelectedJob(null);setShowPayment(true);}}/>
+        <EmployerModal job={selectedJob} onClose={()=>setSelectedJob(null)} paid={paid} onUnlock={()=>{setSelectedJob(null);setShowPayment(true);if(typeof window !== "undefined" && window.posthog) window.posthog.capture("paywall_seen", {source: "employer_card"});}}/>
       )}
       {showEmailModal&&(
         <EmailModal onClose={()=>setShowEmailModal(false)} onCheck={checkEmail} checking={emailChecking} error={emailError}/>
