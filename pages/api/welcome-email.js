@@ -39,6 +39,11 @@ export default async function handler(req, res) {
     .eq("email", normalizedEmail)
     .single();
 
+  // Si l email n est pas dans Customers → pas un client payant → on n envoie rien
+  if (!customer) {
+    return res.status(200).json({ skipped: true, reason: "not a customer" });
+  }
+
   if (customer?.last_welcome_sent) {
     const lastSent = new Date(customer.last_welcome_sent);
     const daysSince = (Date.now() - lastSent.getTime()) / (1000 * 60 * 60 * 24);
