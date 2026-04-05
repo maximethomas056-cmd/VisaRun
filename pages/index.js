@@ -161,8 +161,8 @@ export default function App() {
 
     // Vérifier si client payant pour afficher le banner
     try {
-      const paidEmail = localStorage.getItem("vr_paid_email");
-      if (paidEmail) setWelcomeBanner(true);
+      const token = localStorage.getItem("vr_access_token");
+      if (token) setWelcomeBanner(true);
     } catch {}
   }, []);
 
@@ -186,6 +186,32 @@ export default function App() {
         <meta name="twitter:title" content="VisaRun — Track Your Regional Work & Stay Longer in Australia" />
         <meta name="twitter:description" content="Free payslip tracker for Working Holiday backpackers. Count your regional work days, find direct employer contacts. No middleman." />
         <meta name="twitter:image" content="https://www.visarun.pro/og-image.png" />
+        {/* Canonical — dit à Google quelle est l url officielle */}
+        <link rel="canonical" href="https://www.visarun.pro" />
+        {/* Structured data — aide Google à afficher des rich results */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "VisaRun",
+            "url": "https://www.visarun.pro",
+            "description": "Free payslip tracker for Working Holiday backpackers in Australia. Count your regional work days and find direct employer contacts.",
+            "applicationCategory": "UtilityApplication",
+            "operatingSystem": "Web",
+            "offers": {
+              "@type": "Offer",
+              "price": "24.90",
+              "priceCurrency": "AUD",
+              "description": "Lifetime access to 2,000+ employer contacts across Australia"
+            },
+            "creator": {
+              "@type": "Organization",
+              "name": "VisaRun",
+              "email": "visarunpro@gmail.com"
+            }
+          })}}
+        />
       </Head>
 
       {/* ── Welcome banner pour clients payants ── */}
