@@ -485,8 +485,9 @@ export default function JobFinder({onSwitchTab}){
     }catch{}
     savedHydrated.current=true;
     try{
-      const storedEmail=localStorage.getItem("vr_paid_email");
-      if(storedEmail)setPaid(true);
+      // On lit le token (pas l'email) — si présent, l'accès est déjà débloqué
+      const storedToken=localStorage.getItem("vr_access_token");
+      if(storedToken)setPaid(true);
     }catch{}
   },[]);
 
@@ -514,7 +515,9 @@ export default function JobFinder({onSwitchTab}){
       });
       const data=await res.json();
       if(data.paid){
-        localStorage.setItem("vr_paid_email",normalizedEmail);
+        // On stocke le token (pas l'email) dans le navigateur
+        // → partager son email à quelqu'un ne suffit plus pour accéder
+        localStorage.setItem("vr_access_token", data.token);
         setPaid(true);
         setShowEmailModal(false);
         // Envoyer le mail welcome back via route serveur dédiée
